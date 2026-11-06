@@ -39,3 +39,17 @@ py -3.12 -m venv .venv
 | `tools/` | Skrip uji hardware & benchmark |
 | `tests/` | Tes pytest |
 | `docs/` | PRD, progres, catatan teknis |
+
+## Alat uji & CLI (sementara, sebelum UI)
+
+```powershell
+.venv\Scripts\python tools\list_devices.py          # perangkat & dukungan ASIO
+.venv\Scripts\python tools\test_wasapi.py           # buka sound card di WASAPI Exclusive/Shared
+.venv\Scripts\python tools\calibrate_latency.py     # ukur latensi (butuh kabel loopback)
+.venv\Scripts\python tools\sync_test.py             # uji sinkron 5 track (butuh kabel loopback)
+.venv\Scripts\python tools\stress_test.py --minutes 60
+.venv\Scripts\python tools\cli_session.py --help    # buat proyek, rekam, putar, pilih take
+.venv\Scripts\python tools\make_demo_project.py     # proyek contoh SATB sintetis
+.venv\Scripts\python tools\process_project.py       # proses proyek -> master WAV + MP3 + laporan
+.venv\Scripts\python tools\benchmark.py            # ukur waktu produce() untuk lagu 4 menit
+```
