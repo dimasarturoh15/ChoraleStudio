@@ -144,6 +144,7 @@ class Project:
     metronome_after_count_in: bool = True
     room_preset: str = DEFAULT_ROOM
     reverb_amount: str = DEFAULT_REVERB_AMOUNT
+    vocal_guide_done: bool = False
     created_at: str = field(default_factory=now_iso)
     modified_at: str = field(default_factory=now_iso)
     tracks: dict[str, Track] = field(default_factory=lambda: {t: Track(t) for t in TRACK_IDS})
@@ -186,6 +187,7 @@ class Project:
             "metronome_after_count_in": self.metronome_after_count_in,
             "room_preset": self.room_preset,
             "reverb_amount": self.reverb_amount,
+            "vocal_guide_done": self.vocal_guide_done,
             "created_at": self.created_at,
             "modified_at": self.modified_at,
             "tracks": [
@@ -216,6 +218,7 @@ class Project:
             metronome_after_count_in=bool(data.get("metronome_after_count_in", True)),
             room_preset=data.get("room_preset", DEFAULT_ROOM),
             reverb_amount=data.get("reverb_amount", DEFAULT_REVERB_AMOUNT),
+            vocal_guide_done=bool(data.get("vocal_guide_done", False)),
             created_at=data.get("created_at", now_iso()),
             modified_at=data.get("modified_at", now_iso()),
             tracks=tracks,
@@ -235,7 +238,7 @@ class Project:
     def update_settings(self, **changes) -> None:
         """Ubah judul/tempo/birama/hitungan awal/metronom/preset ruang/jumlah reverb."""
         allowed = {"title", "tempo", "time_signature", "count_in_bars", "metronome_after_count_in",
-                   "room_preset", "reverb_amount"}
+                   "room_preset", "reverb_amount", "vocal_guide_done"}
         unknown = set(changes) - allowed
         if unknown:
             raise ValueError(f"Pengaturan tidak dikenal: {', '.join(sorted(unknown))}")

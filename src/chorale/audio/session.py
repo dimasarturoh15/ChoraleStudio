@@ -82,11 +82,13 @@ class AudioSession:
         calibration_path: Path | None = None,
         device_timeout: float = 1.0,
         stream_factory=open_duplex_stream,
+        playback_mix: np.ndarray | None = None,
     ):
         """
         metronome: klik selama lagu (None = ikuti pengaturan proyek).
         count_in: pakai hitungan awal (None = ya saat merekam, tidak saat hanya memutar).
         latency_samples: paksa nilai latensi; None = dari kalibrasi, atau perkiraan driver.
+        playback_mix: buffer stereo yang diputar sebagai ganti campuran proyek (mis. pratinjau satu take).
         """
         self.project = project
         self.selection = selection
@@ -129,7 +131,9 @@ class AudioSession:
                 self.latency_source = "kalibrasi"
 
         # Persiapan berat dilakukan di sini, sebelum stream berjalan.
-        self.player = Player(build_monitor_mix(project, exclude=record_track, gain_db=monitor_gain_db))
+        if playback_mix is None:
+            playback_mix = build_monitor_mix(project, exclude=record_track, gain_db=monitor_gain_db)
+        self.player = Player(playback_mix)
         start_frame = int(round(start_seconds * SAMPLE_RATE)) if record_track is None else 0
         self.player.seek(start_frame - self.count_in_frames)
         self._song_frame = start_frame - self.count_in_frames

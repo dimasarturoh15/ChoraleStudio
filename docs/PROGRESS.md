@@ -11,7 +11,8 @@ Rujukan: [PRD_v1.1.md](PRD_v1.1.md). Daftar segmen di bawah adalah rancangan awa
 | 4 | Pascaproduksi FR-5 & FR-6: HPF, EQ, kompresor, penyeimbang, panning, reverb | 2 | ✅ Selesai; DeepFilterNet ditunda (menunggu keputusan pengguna) |
 | 5 | Mastering FR-7, pengukuran (LUFS/TP/LRA), ekspor & laporan FR-8, verifikasi ebur128 | 2 | ✅ Selesai (gerbang Sprint 2 lulus, dengan peredam derau dilewati) |
 | 6 | UI PySide6: kerangka, tema, daftar proyek, proyek baru, pengaturan + kalibrasi | 3 | ✅ Selesai |
-| 7 | UI: layar rekam 5 track, VU meter, transport, daftar take, panduan rekam, proses & hasil/A-B | 3 | Belum |
+| 7 | UI: layar utama perekaman (5 track, transport, take, wizard vokal, error perangkat) | 3 | ✅ Kode, tes & screenshot selesai; uji manual SC202HD menunggu hardware |
+| 7b | UI: layar Proses Produksi & Hasil/A-B (sisa Sprint 3) | 3 | Belum |
 | 8 | Uji lapangan dengan paduan suara, perbaikan bug, uji penerimaan (Bagian 10) | 4 | Belum |
 | 9 | Paket PyInstaller + installer Inno Setup | 4 | Belum |
 
@@ -322,3 +323,78 @@ Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
 - Ukuran font diatur lewat QSS (`role`), karena `setFont` kalah oleh aturan QSS global.
 - Jarak ikon-teks pada tombol dibuat dengan dua spasi di depan teks (QSS Qt tidak punya pengaturan jarak ikon).
 - Mode driver disimpan hanya jika pengguna mengubahnya; selain itu tetap otomatis (ASIO → WASAPI Exclusive → Shared).
+
+---
+
+## Segmen 7 — Layar Utama Perekaman (kode, tes & screenshot selesai; uji manual bersama pengguna menunggu SC202HD)
+
+**Yang dikerjakan**
+- `ui/recording_screen.py`:
+  - Bar atas: kembali, judul, pil status "driver · 48 kHz · 24-bit · latensi" (merah "Sound card tidak tersambung"; klik untuk menghubungkan ulang), Pengaturan.
+  - Transport: Ke Awal / Putar / Stop, jam mm:ss.mmm (negatif selama hitungan awal), kotak Tempo/Birama/Hitungan Awal, tombol Metronom, slider Volume Metronom.
+  - Bar produksi: Ruang, Jumlah Reverb, "Proses Produksi & Master" yang nonaktif dengan teks "Rekam kelima track terlebih dahulu" sampai 5 track terisi.
+  - Shortcut Spasi = Putar/Stop dan R = rekam track terpilih. Tombol dibuat tanpa fokus keyboard agar tidak "menelan" Spasi.
+- `ui/track_strip.py`:
+  - Bilah track: garis warna, nama, keterangan input sesuai Pengaturan.
+  - Tombol rekam 72 px dengan 3 status (abu / merah berkedip / hijau centang).
+  - S/M, volume −12..+6 dB (langkah 0,5 dB; klik dua kali = 0 dB).
+  - Tombol take dan panel "Pilih Take — <Track>": radio, waktu · durasi, pratinjau ▶/■, lencana "Tidak lengkap", "Rekam Ulang (Take Baru)".
+  - Meter vertikal (hijau/kuning/merah sesuai FR-1) dengan lampu clip yang tetap menyala sampai diklik.
+- `ui/waveform.py`: peak per 10 ms dihitung **sekali per file** di QThreadPool, lalu disimpan di cache memori (kunci: path + ukuran + waktu ubah). Kolom piksel dihitung ulang hanya bila data atau ukuran berubah. Saat merekam, waveform digambar langsung dari meter input, tanpa membaca file.
+- `ui/audio_controller.py`: satu-satunya penghubung ke engine.
+  - Persiapan sesi (memuat & mencampur take) berjalan di thread pekerja.
+  - `poll()` dipanggil QTimer 30 fps. **Tidak ada sinyal Qt dari callback audio.**
+  - Saat diam, meter input aktif untuk track terpilih.
+  - Mendeteksi sound card hilang saat merekam, memutar, maupun diam.
+- `ui/vocal_guide.py`: wizard "Persiapan Rekam Vokal" 3 langkah (indikator langkah, panduan bernomor, gambar posisi penyanyi, meter target −14..−10 dBFS dengan "Puncak" 3 detik dan status "Level sudah pas", tombol "Putar Piano" di langkah 3). Muncul sekali per proyek sebelum rekam vokal pertama (`Project.vocal_guide_done`).
+- `ui/device_error.py` + `ui/overlay.py`: dialog "Sound card terputus" dengan detik terakhir yang tersimpan. "Hubungkan Ulang" memuat ulang daftar perangkat PortAudio (`device.refresh_devices()`) lalu mencoba memilih perangkat lagi; jika gagal, pesannya muncul di dialog.
+- Engine:
+  - `AudioSession(playback_mix=...)` untuk pratinjau satu take.
+  - `AppSettings.metronome_volume` (persen, 100% = 0 dB).
+  - `Project.vocal_guide_done`.
+
+**Hasil tes**: 222 tes lulus. `tests/test_recording_ui.py` memakai stream & monitor palsu, dan menguji:
+- Peak dan cache waveform.
+- Status level wizard, format jam, teks input.
+- Teks dan lebar kolom kontrol (nama track dan teks input tampil utuh di ≤ 500 px).
+- Rekam piano → banner, track lain nonaktif → stop → take & status hijau.
+- Wizard sebelum vokal pertama (sekali per proyek).
+- Vokal sebelum piano ditolak.
+- **Sound card dicabut saat merekam**: dialog berisi "Rekaman Piano/Orgen sampai detik 00:01 sudah tersimpan dengan aman", take tidak lengkap tetapi audio utuh sampai blok terakhir, lalu Hubungkan Ulang berhasil.
+- Putar + meter + mute.
+- Panel take (pilih take).
+- Tombol produksi aktif hanya jika 5 track terisi.
+- Dialog saat perangkat tidak ada.
+
+**Uji dengan sound card sungguhan (Realtek, pengganti sementara)**:
+- Rekam piano 2,5 detik dengan hitungan awal → take 2,46 detik, lengkap, 0 dropout.
+- Kompensasi latensi dari perkiraan driver (2304 sampel), dengan peringatan "Belum ada kalibrasi…".
+- Putar → berhenti otomatis di akhir.
+
+**Screenshot**: `docs/screenshots/08`–`13`. **Audio di screenshot disimulasikan** (stream palsu, proyek contoh SATB sintetis; nama "SPL Audio SC202HD" dan "12 ms" adalah data contoh), karena SC202HD belum tersambung.
+
+**Perbandingan dengan mockup**
+
+| Bagian | Perbedaan | Alasan |
+|---|---|---|
+| Nama track & input | Selalu utuh ("Piano/Orgen", "Input 1–2 · Stereo"); judul lagu satu baris | Cacat mockup tidak ditiru |
+| Banner merekam | "● MEREKAM — ALTO" satu baris; di kanan "Tekan Stop untuk selesai", atau "Hitungan awal … n" selama hitungan awal | Mockup memotong teks; hitungan awal perlu terlihat |
+| Tombol take saat merekam | "Take 2 · Merekam" | "Take 1 (Merekam…)" di mockup terpotong |
+| Take tidak lengkap | Teks tombol kuning + tooltip; lencana "Tidak lengkap" di panel | Tanda "(!)" membuat teks terpotong |
+| Meter level vertikal | Ditambahkan di kanan waveform | Diminta di prompt; tidak ada di mockup |
+| Waveform | Dari audio asli, skala dB | Mockup hanya ilustrasi |
+| Pil status | Latensi hanya ditampilkan jika sudah dikalibrasi | Tidak menampilkan angka yang belum diukur |
+| Tinggi bilah | 112 px | Agar 5 track + banner muat di 900 px; di 1280×800 daftar track bisa digulir |
+| Wizard langkah 1 & 3 | Isi dari PRD bagian 9 + gambar posisi + "Putar Piano" | Mockup hanya menampilkan langkah 2 |
+| Proses Produksi & Master | Saat 5 track terisi: pesan sementara | Layar proses & hasil = segmen berikutnya |
+
+**Keputusan teknis**
+- Rekam vokal berhenti otomatis 2 detik setelah musik panduan habis. Rekam piano berhenti hanya dengan Stop.
+- Mengubah solo/mute/volume saat memutar akan membuat campuran ulang dan melanjutkan dari posisi yang sama, karena callback hanya membaca buffer yang sudah dicampur.
+- Meter track saat memutar memakai peak yang sudah di-cache (tidak ada kerja tambahan di callback). Meter input hanya untuk track yang direkam atau, saat diam, track yang dipilih.
+- Tombol "Metronom" = pengaturan proyek "metronom tetap bunyi setelah hitungan awal". Hitungan awal selalu berbunyi saat merekam.
+- Wizard menganggap proyek "sudah punya vokal" jika ada take vokal apa pun, termasuk take yatim hasil pemulihan.
+
+**Masalah terbuka**
+- Uji manual bersama pengguna (rekam piano + 1 suara sungguhan, ganti take, solo/mute, cabut USB saat merekam) menunggu SC202HD tersambung.
+- 2 commit sebelumnya (Segmen 5 & 6) belum ter-push karena github.com tidak bisa dihubungi dari laptop ini.

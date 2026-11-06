@@ -19,12 +19,22 @@ _PATHS = {
     "check": '<path d="M5 12.5l4.5 4.5L19 7"/>',
     "close": '<path d="M6 6l12 12M18 6L6 18"/>',
     "folder": '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+    "play": '<path d="M7 4.5v15l13-7.5z" fill="{c}" stroke="none"/>',
+    "stop": '<rect x="6" y="6" width="12" height="12" rx="1.5" fill="{c}" stroke="none"/>',
+    "skip_back": '<path d="M6 5v14"/><path d="M19 5L9 12l10 7z"/>',
+    "mic": '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+    "metronome": '<path d="M7 21L10 3h4l3 18z"/><path d="M12 16l5-9"/>',
+    "sparkles": '<path d="M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z"/>'
+                '<path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8z"/>',
+    "dot": '<circle cx="12" cy="12" r="7" fill="{c}" stroke="none"/>',
+    "warning": '<path d="M12 3L2 20h20z"/><path d="M12 10v4M12 17v.5"/>',
 }
 
 
 def svg(name: str, color: str, stroke: float = 2.0) -> str:
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="{color}" '
-            f'stroke-width="{stroke}" stroke-linecap="round" stroke-linejoin="round">{_PATHS[name]}</svg>')
+            f'stroke-width="{stroke}" stroke-linecap="round" stroke-linejoin="round">'
+            f'{_PATHS[name].replace("{c}", color)}</svg>')
 
 
 def pixmap(name: str, color: str, size: int, stroke: float = 2.0, ratio: float = 2.0) -> QPixmap:

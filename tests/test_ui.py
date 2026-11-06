@@ -273,9 +273,12 @@ def test_settings_shows_saved_calibration(qapp, monkeypatch):
     assert page.last_calibrated.text() == "Terakhir dikalibrasi 06-11-2026 13:15"
 
 
-def test_main_window_navigation(qapp, tmp_path):
+def test_main_window_navigation(qapp, tmp_path, monkeypatch):
     from chorale.ui.main_window import MainWindow
 
+    # Tanpa sound card: layar perekaman tidak boleh membuka perangkat sungguhan di tes.
+    monkeypatch.setattr("chorale.ui.audio_controller.AudioController.connect_device",
+                        lambda self, refresh=False: False)
     save_settings(AppSettings(projects_dir=str(tmp_path)))
     w = MainWindow()
     assert (w.width(), w.height()) == (1440, 900)
@@ -288,8 +291,9 @@ def test_main_window_navigation(qapp, tmp_path):
     w.show_new_project()
     w.new_project.title_edit.setText("Lagu Baru")
     folder = w.new_project.submit()
-    assert w.stack.currentWidget() is w.project_screen
-    assert w.project_screen.title.text() == "Lagu Baru" and folder.parent == tmp_path
+    assert w.stack.currentWidget() is w.recording
+    assert w.recording.title.text() == "Lagu Baru" and folder.parent == tmp_path
     w.show_projects()
     assert w.projects.row_count() == 1
+    w.recording.shutdown()
     w.settings_screen.shutdown()

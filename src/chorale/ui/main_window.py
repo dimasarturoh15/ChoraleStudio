@@ -5,49 +5,18 @@ from __future__ import annotations
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QStackedWidget, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QStackedWidget, QWidget
 
 from chorale.project import add_recent, open_project
 from chorale.project.store import default_projects_dir
 from chorale.settings import load_settings
 from chorale.ui.new_project import NewProjectOverlay
 from chorale.ui.project_list import ProjectListScreen
+from chorale.ui.recording_screen import RecordingScreen
 from chorale.ui.settings_screen import SettingsScreen
-from chorale.ui.theme import COLORS
-from chorale.ui.widgets import TopBar, button, label, vbox
 
 WINDOW_SIZE = (1440, 900)
 MIN_SIZE = (1280, 800)
-
-
-class ProjectScreen(QWidget):
-    """Sementara: layar rekam 5 track dibuat di Segmen 7."""
-
-    def __init__(self, on_back, parent=None):
-        super().__init__(parent)
-        self.setObjectName("screen")
-        bar = TopBar()
-        back = button("", "square", "arrow_left", COLORS["text2"], 20)
-        back.setToolTip("Kembali ke daftar proyek")
-        back.clicked.connect(on_back)
-        self.title = label("", "appTitle")
-        bar.layout_.setSpacing(16)
-        bar.layout_.addWidget(back)
-        bar.layout_.addWidget(self.title)
-        bar.layout_.addStretch(1)
-        self.info = label("", "secondary")
-        self.info.setWordWrap(True)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(0, 0, 0, 0)
-        lay.addWidget(bar)
-        lay.addLayout(vbox(self.info, None, margins=(48, 32, 48, 32)))
-
-    def show_project(self, project) -> None:
-        self.project = project
-        self.title.setText(project.title)
-        done = sum(1 for t in project.tracks.values() if t.has_audio)
-        self.info.setText(f"{project.tempo} BPM · {project.time_signature} · {done} dari 5 track terekam.\n"
-                          f"Folder: {project.folder}\n\nLayar rekam 5 track dibuat di Segmen 7.")
 
 
 class MainWindow(QMainWindow):
@@ -61,8 +30,8 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
         self.projects = ProjectListScreen()
         self.settings_screen = SettingsScreen()
-        self.project_screen = ProjectScreen(self.show_projects)
-        for w in (self.projects, self.settings_screen, self.project_screen):
+        self.recording = RecordingScreen()
+        for w in (self.projects, self.settings_screen, self.recording):
             self.stack.addWidget(w)
         self.setCentralWidget(self.stack)
         self._previous: QWidget = self.projects
@@ -76,22 +45,30 @@ class MainWindow(QMainWindow):
         self.projects.settingsRequested.connect(self.show_settings)
         self.settings_screen.closed.connect(self._back_from_settings)
         self.settings_screen.saved.connect(self._settings_saved)
+        self.recording.backRequested.connect(self.show_projects)
+        self.recording.settingsRequested.connect(self.show_settings)
+        self.recording.produceRequested.connect(self._produce)
 
     def projects_dir(self) -> Path:
         return Path(self.settings.projects_dir) if self.settings.projects_dir else default_projects_dir()
 
     # ----- navigasi -----
     def show_projects(self) -> None:
+        self.recording.shutdown()
         self.projects.refresh()
         self.stack.setCurrentWidget(self.projects)
 
     def show_settings(self) -> None:
         self._previous = self.stack.currentWidget()
+        if self._previous is self.recording:
+            self.recording.suspend()
         self.settings_screen.open(self.settings)
         self.stack.setCurrentWidget(self.settings_screen)
 
     def _back_from_settings(self) -> None:
         self.stack.setCurrentWidget(self._previous)
+        if self._previous is self.recording:
+            self.recording.resume(self.settings)
 
     def _settings_saved(self, settings) -> None:
         self.settings = settings
@@ -116,10 +93,15 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Proyek tidak bisa dibuka", f"Proyek tidak bisa dibuka:\n{exc}")
             return
         add_recent(project)
-        self.project_screen.show_project(project)
-        self.stack.setCurrentWidget(self.project_screen)
+        self.stack.setCurrentWidget(self.recording)
+        self.recording.show_project(project, self.settings)
+
+    def _produce(self, project) -> None:
+        self.recording.toast.show_message("Layar Proses Produksi & Master dibuat di Segmen 8. Untuk sekarang "
+                                          "jalankan tools\\process_project.py.")
 
     def closeEvent(self, event):
+        self.recording.shutdown()
         self.settings_screen.shutdown()
         super().closeEvent(event)
 

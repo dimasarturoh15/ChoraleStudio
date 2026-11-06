@@ -128,6 +128,15 @@ class DeviceSelection:
         return min(2, self.output.max_output_channels)
 
 
+def refresh_devices() -> None:
+    """Muat ulang daftar perangkat PortAudio agar sound card yang baru dicolok terlihat.
+
+    Semua stream harus sudah ditutup sebelum memanggil ini.
+    """
+    sd._terminate()
+    sd._initialize()
+
+
 def hostapi_names() -> list[str]:
     """Nama semua host API yang tersedia di build PortAudio yang dimuat."""
     return [h["name"] for h in sd.query_hostapis()]

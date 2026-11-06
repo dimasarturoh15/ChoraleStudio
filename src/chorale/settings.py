@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 
@@ -23,6 +24,10 @@ class AppSettings:
     instrument_input: str = "1-2"
     vocal_input: str = "1"
     projects_dir: str | None = None     # None = Documents\HarmoniSATB
+    metronome_volume: int = 80          # persen; 100% = 0 dB
+
+    def metronome_volume_db(self) -> float:
+        return 20 * math.log10(max(self.metronome_volume, 1) / 100)
 
     def instrument_channels(self) -> tuple[int, int]:
         """(kanal pertama berbasis 0, jumlah kanal) untuk merekam piano."""
@@ -58,6 +63,8 @@ def load_settings(path: Path | None = None) -> AppSettings:
         s.instrument_input = defaults.instrument_input
     if s.vocal_input not in VOCAL_INPUTS:
         s.vocal_input = defaults.vocal_input
+    if not isinstance(s.metronome_volume, int) or not 0 <= s.metronome_volume <= 100:
+        s.metronome_volume = defaults.metronome_volume
     return s
 
 
