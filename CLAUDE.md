@@ -31,7 +31,7 @@ Aplikasi desktop Windows untuk merekam paduan suara SATB (Sopran, Alto, Tenor, B
 - Callback audio TIDAK boleh: alokasi memori besar, I/O disk, logging, atau menyentuh objek Qt. Gunakan queue/ring buffer dan thread terpisah untuk tulis disk.
 - Rekaman ditulis ke disk terus-menerus selama merekam (maksimal 1 detik hilang jika listrik padam).
 - Prioritas driver: ASIO (jika ada) → WASAPI Exclusive → WASAPI Shared.
-- Suara penyanyi sendiri TIDAK diputar ulang oleh software (monitoring vokal lewat kenop direct monitor sound card).
+- Suara penyanyi sendiri TIDAK diputar ulang oleh software (monitoring vokal lewat tombol direct monitor sound card).
 - Prioritas mastering: True Peak ≤ -1.0 dBTP (mutlak) > -14 LUFS ±1 > LRA (hanya dilaporkan).
 - Engine DSP harus bisa dijalankan dari baris perintah tanpa UI.
 - Tidak ada fitur di luar PRD (pitch correction, punch-in, VST, dll. dilarang).

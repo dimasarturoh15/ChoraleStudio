@@ -116,7 +116,7 @@ def main() -> int:
     print()
     print(f"  Akan merekam track {label} selama {args.seconds:g} detik dari INPUT {args.input}.")
     print("  Pakai headphone: Anda akan mendengar piano uji. Suara Anda sendiri TIDAK diputar")
-    print("  oleh aplikasi; dengarkan lewat kenop direct monitor sound card.")
+    print("  oleh aplikasi; dengarkan lewat tombol direct monitor sound card.")
     if not args.yes:
         input("\n  Tekan Enter jika sudah siap... ")
     for n in (3, 2, 1):

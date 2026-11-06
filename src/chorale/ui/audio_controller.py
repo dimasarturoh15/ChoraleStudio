@@ -7,6 +7,7 @@ take) dikerjakan di thread pekerja; poll() mengambil hasilnya bila sudah siap.
 
 from __future__ import annotations
 
+import logging
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -24,6 +25,7 @@ from chorale.project.model import Project, Take
 from chorale.settings import AppSettings
 
 IDLE, PREPARING, PLAYING, RECORDING, PREVIEW = "idle", "preparing", "playing", "recording", "preview"
+log = logging.getLogger("chorale.audio")
 AUTO_STOP_TAIL_S = 2.0
 
 
@@ -91,9 +93,12 @@ class AudioController:
             keywords = self.settings.device_name or dev.TARGET_KEYWORDS
             self.selection = dev.select_device(keywords, mode=self.settings.driver_mode)
             self.device_error = None
+            log.info("Sound card: %s / %s (%s)", self.selection.input.name, self.selection.output.name,
+                     self.selection.mode_label)
         except dev.AudioDeviceError as exc:
             self.selection = None
             self.device_error = str(exc)
+            log.warning("Sound card tidak bisa dipilih: %s %s", exc, getattr(exc, "technical", ""))
         return self.selection is not None
 
     def latency_ms(self) -> tuple[float | None, bool]:
@@ -245,6 +250,7 @@ class AudioController:
                     self.session.start()
                     self.mode = self._pending_mode
                 except Exception as exc:  # noqa: BLE001
+                    log.exception("Gagal memulai sesi audio (%s)", self._pending_mode)
                     self.session = None
                     self.mode = IDLE
                     self.record_track = None
@@ -259,6 +265,8 @@ class AudioController:
             saved = take.duration if take is not None else 0.0
             label = self.project.track(track).label if track else None
             loss = DeviceLoss(self.card_name, label, saved, take)  # nama diambil sebelum selection dikosongkan
+            log.warning("Sound card terputus saat %s; tersimpan %.2f s (%s)", self.mode, saved,
+                        take.filename if take else "tanpa take")
             self.selection = None
             self.device_error = dev.MSG_DEVICE_LOST
             self._finish(take=take, warnings=[], loss=loss)

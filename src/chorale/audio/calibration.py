@@ -10,7 +10,6 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 import numpy as np
-from scipy import signal
 
 from chorale.appdirs import user_config_dir, write_json_atomic
 
@@ -25,6 +24,8 @@ def make_sweep(
     amplitude: float = 0.5,
 ) -> np.ndarray:
     """Sweep logaritmik pendek dengan fade 5 ms di kedua ujung (float32, mono)."""
+    from scipy import signal  # dimuat saat dibutuhkan (import scipy lambat)
+
     t = np.arange(int(round(duration * samplerate))) / samplerate
     sweep = signal.chirp(t, f0=f_start, t1=duration, f1=f_end, method="logarithmic")
     fade = int(0.005 * samplerate)
@@ -52,6 +53,8 @@ def estimate_delay(recorded: np.ndarray, reference: np.ndarray) -> DelayEstimate
     makin yakin; di bawah ~20 berarti sinyal uji kemungkinan tidak tertangkap).
     inverted: True jika polaritas terbalik.
     """
+    from scipy import signal
+
     recorded = np.asarray(recorded, dtype=np.float64)
     reference = np.asarray(reference, dtype=np.float64)
     corr = signal.correlate(recorded, reference, mode="full", method="fft")
@@ -138,7 +141,7 @@ SAFETY_STEPS = (
     "Kecilkan volume headphone ke nol atau lepas headphone dari kepala.",
     "Matikan phantom +48V di sound card.",
     "Sambungkan kabel dari Output sound card ke Input 1, dan kecilkan gain input.",
-    "Kecilkan kenop direct monitor agar suara input tidak ikut terdengar.",
+    "Matikan tombol direct monitor (OFF) agar suara input tidak ikut terdengar.",
 )
 
 

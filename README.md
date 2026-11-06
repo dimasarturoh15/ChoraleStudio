@@ -61,3 +61,30 @@ py -3.12 -m venv .venv
 .venv\Scripts\python tools\benchmark.py            # ukur waktu produce() untuk lagu 4 menit
 .venv\Scripts\python tools\ui_screenshots.py         # screenshot tiap layar -> docs\screenshots
 ```
+
+## Dokumen
+
+- [Panduan pengguna](docs/PANDUAN_PENGGUNA.md): dari instalasi sampai ekspor, bergambar
+- [Checklist uji lapangan](docs/UJI_LAPANGAN.md): uji bersama paduan suara (kriteria penerimaan PRD bagian 10)
+
+## Membuat installer
+
+Butuh **Inno Setup 6** (gratis): unduh dari https://jrsoftware.org/isdl.php, atau jalankan
+`winget install --id JRSoftware.InnoSetup -e` di PowerShell.
+
+```powershell
+.venv\Scripts\python -m pip install -r requirements-build.txt
+.venv\Scripts\python tools\build_installer.py
+```
+
+Hasil:
+- `dist\HarmoniSATB Studio\`: aplikasi siap jalan (PyInstaller onedir) + folder `licenses\`
+- `installer\Output\HarmoniSATB-Studio-<versi>-Setup.exe`: installer (shortcut Start Menu & Desktop; data di `%APPDATA%\HarmoniSATB` dan folder proyek tidak dihapus saat uninstall)
+
+Skrip build otomatis menguji aplikasi hasil build tanpa Python di PATH, termasuk
+`"HarmoniSATB Studio.exe" --uji-mandiri` (5 track sintetis → WAV + MP3 + laporan; kode keluar 0 = lulus).
+
+## Log
+
+Log aplikasi ada di `%APPDATA%\HarmoniSATB\logs\` (berotasi, 5 × 1 MB). Bisa juga dibuka lewat
+Pengaturan → Tentang Aplikasi → Buka Folder Log.

@@ -30,15 +30,7 @@ from chorale.dsp.measure import CrossCheck, Loudness, fast_integrated_lufs, ffmp
 from chorale.dsp.reverb import REVERB_AMOUNT_LABELS, ROOM_PRESETS
 from chorale.project.model import TRACK_LABELS
 
-STEP_LABELS = {
-    1: "Membersihkan derau",
-    2: "Menyaring frekuensi rendah",
-    3: "Merapikan karakter suara",
-    4: "Menyeimbangkan volume antar-suara",
-    5: "Menata posisi stereo",
-    6: "Menambahkan ruang (reverb)",
-    7: "Mastering standar YouTube",
-}
+from chorale.dsp.presets import STEP_LABELS  # noqa: E402,F401  (diekspor ulang)
 # Tahap rantai FR-5 (1-7) -> langkah layar (1-6); langkah 7 = mastering + ekspor.
 _CHAIN_TO_STEP = {1: 1, 2: 2, 3: 3, 4: 3, 5: 4, 6: 5, 7: 6}
 _CHAIN_SHARE = 55.0  # persen progres untuk rantai pascaproduksi; sisanya mastering & ekspor

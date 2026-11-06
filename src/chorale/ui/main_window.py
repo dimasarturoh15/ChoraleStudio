@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from PySide6.QtCore import Qt
@@ -17,6 +18,7 @@ from chorale.ui.recording_screen import RecordingScreen
 from chorale.ui.result_screen import ResultScreen
 from chorale.ui.settings_screen import SettingsScreen
 
+log = logging.getLogger("chorale.ui")
 WINDOW_SIZE = (1440, 900)
 MIN_SIZE = (1280, 800)
 
@@ -99,6 +101,7 @@ class MainWindow(QMainWindow):
                                 "Folder ini bukan proyek HarmoniSATB (tidak ada proyek.json).")
             return
         except Exception as exc:  # noqa: BLE001
+            log.exception("Proyek tidak bisa dibuka: %s", folder)
             QMessageBox.warning(self, "Proyek tidak bisa dibuka", f"Proyek tidak bisa dibuka:\n{exc}")
             return
         add_recent(project)

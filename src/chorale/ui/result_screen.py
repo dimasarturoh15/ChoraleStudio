@@ -11,12 +11,11 @@ from PySide6.QtWidgets import QFrame, QGridLayout, QPushButton, QScrollArea, QVB
 
 from chorale.audio import device as dev
 from chorale.audio.ab_player import SOURCE_A, SOURCE_B, ABPlayer
-from chorale.dsp.export import fmt_duration
-from chorale.dsp.master import CEILING_DBTP, LUFS_TOLERANCE, TARGET_LUFS
-from chorale.dsp.reverb import REVERB_AMOUNT_LABELS, ROOM_PRESETS
+from chorale.dsp.presets import CEILING_DBTP, LUFS_TOLERANCE, REVERB_AMOUNT_LABELS, ROOM_PRESETS, TARGET_LUFS
 from chorale.settings import AppSettings
 from chorale.ui import icons
 from chorale.ui.recording_screen import Toast, fmt_clock
+from chorale.ui.track_strip import fmt_duration
 from chorale.ui.theme import COLORS
 from chorale.ui.waveform import WaveformView, peaks_from_array
 from chorale.ui.widgets import SegmentedControl, TopBar, button, card, hbox, icon_label, label, refresh_style, vbox

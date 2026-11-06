@@ -8,8 +8,6 @@ pre-delay 32 ms. Seed tetap, jadi IR selalu sama untuk preset yang sama.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import numpy as np
 from scipy import signal
 
@@ -18,23 +16,9 @@ PRE_DELAY_S = 0.032
 DAMPING_HZ = 5000.0
 
 
-@dataclass(frozen=True)
-class RoomPreset:
-    label: str
-    decay_s: float  # RT60: waktu ekor turun 60 dB
-
-
-ROOM_PRESETS = {
-    "gereja_kecil": RoomPreset("Gereja Kecil", 1.6),
-    "aula": RoomPreset("Aula", 2.0),
-    "katedral": RoomPreset("Katedral", 2.4),
-}
-DEFAULT_ROOM = "katedral"
-
-# Porsi wet pada campuran akhir: keluaran = (1 - wet) * dry + wet * reverb.
-REVERB_AMOUNTS = {"sedikit": 0.12, "normal": 0.20, "banyak": 0.30}
-REVERB_AMOUNT_LABELS = {"sedikit": "Sedikit", "normal": "Normal", "banyak": "Banyak"}
-DEFAULT_AMOUNT = "normal"
+from chorale.dsp.presets import (  # noqa: E402,F401  (diekspor ulang)
+    DEFAULT_AMOUNT, DEFAULT_ROOM, REVERB_AMOUNT_LABELS, REVERB_AMOUNTS, ROOM_PRESETS, RoomPreset,
+)
 
 
 def make_ir(decay_s: float, samplerate: int = SAMPLE_RATE, pre_delay_s: float = PRE_DELAY_S,

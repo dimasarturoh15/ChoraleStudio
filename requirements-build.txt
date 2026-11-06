@@ -1,0 +1,2 @@
+# Alat build installer (tidak dibutuhkan untuk menjalankan aplikasi dari sumber).
+pyinstaller==6.22.3

@@ -24,9 +24,7 @@ from chorale.dsp.chain import compress
 from chorale.dsp.measure import fast_integrated_lufs, integrated_lufs, loudness_range, oversampled_peaks
 
 SAMPLE_RATE = 48000
-TARGET_LUFS = -14.0
-LUFS_TOLERANCE = 1.0
-CEILING_DBTP = -1.0
+from chorale.dsp.presets import CEILING_DBTP, LUFS_TOLERANCE, TARGET_LUFS  # noqa: E402,F401
 LIMITER_MARGIN_DB = 0.15  # batas aman agar meter lain (mis. FFmpeg) juga membaca <= -1,0
 MAX_LIMITER_REDUCTION_DB = 6.0
 LOOKAHEAD_S = 0.005

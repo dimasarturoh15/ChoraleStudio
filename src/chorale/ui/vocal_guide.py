@@ -27,9 +27,9 @@ STEP_ITEMS = (
      "Minta kelompok menyanyikan bagian paling keras dari lagu.",
      "Putar kenop Gain sampai meter berada di area target.",
      "Jangan ubah Gain selama merekam suara ini."),
-    ("Putar kenop direct monitor sampai penyanyi mendengar suaranya sendiri dan musik dengan nyaman.",
+    ("Nyalakan tombol direct monitor (ON) agar penyanyi mendengar suaranya sendiri, lalu atur volume agar nyaman.",
      "Atur volume headphone secukupnya agar tidak bocor ke mic.",
-     "Suara penyanyi tidak diputar oleh aplikasi; penyanyi mendengarnya lewat kenop direct monitor.",
+     "Suara penyanyi tidak diputar oleh aplikasi; penyanyi mendengarnya lewat tombol direct monitor.",
      "Tekan Putar Piano untuk mencoba volume headphone."),
 )
 HIGHLIGHT = (None, 2, 0)
@@ -261,7 +261,7 @@ class VocalGuideOverlay(ModalOverlay):
         self.piano_btn = button("Putar Piano", "secondary", "play", COLORS["text"], 16)
         self.piano_btn.clicked.connect(self.playPianoRequested)
         phones_text = label("Penyanyi mendengar piano dan suara yang sudah direkam lewat headphone. "
-                            "Suara mereka sendiri hanya lewat kenop direct monitor di sound card.", "secondary")
+                            "Suara mereka sendiri hanya lewat tombol direct monitor di sound card.", "secondary")
         phones_text.setWordWrap(True)
         phones_panel = QFrame()
         phones_panel.setObjectName("guidePanel")

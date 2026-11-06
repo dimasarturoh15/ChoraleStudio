@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import threading
 from datetime import datetime
 
@@ -26,6 +27,7 @@ from chorale.ui.widgets import (
     LevelMeterBar, SegmentedControl, TopBar, button, card, color_dot, hbox, icon_label, label, vbox,
 )
 
+log = logging.getLogger("chorale.settings")
 BUFFER_LABELS = {n: f"{n} sampel" for n in dev.BLOCKSIZE_CHOICES}
 INSTRUMENT_OPTIONS = [("1-2", "Input 1–2 · Stereo"), ("1", "Input 1 · Mono"), ("2", "Input 2 · Mono")]
 VOCAL_OPTIONS = [("1", "Input 1 · Mono"), ("2", "Input 2 · Mono")]
@@ -50,12 +52,15 @@ class CalibrationWorker(QThread):
             result = measure_latency(self.selection, self.blocksize, progress=self.progressed.emit,
                                      cancel=self.cancel)
             save_calibration(result)
+            log.info("Kalibrasi: %d sampel (%.2f ms), percobaan %s", result.latency_samples, result.latency_ms,
+                     result.runs_samples)
             self.succeeded.emit(result)
         except CalibrationCancelled:
             self.failed.emit("Kalibrasi dibatalkan.")
         except (CalibrationError, dev.AudioDeviceError) as exc:
             self.failed.emit(str(exc))
         except Exception as exc:  # noqa: BLE001
+            log.exception("Kalibrasi gagal")
             self.failed.emit(f"Kalibrasi gagal: {exc}")
 
 
@@ -396,19 +401,14 @@ class AudioDevicePage(QWidget):
 
 
 class AboutPage(QWidget):
+    """Versi aplikasi, komponen pihak ketiga beserta lisensinya, folder lisensi & log."""
+
     def __init__(self, parent=None):
         super().__init__(parent)
+        from chorale.licenses import COMPONENTS, licenses_dir, version_of
+        from chorale.logging_setup import log_dir
+
         self.setObjectName("scrollContent")
-        lines = [
-            ("HarmoniSATB Studio", "h3"),
-            (f"Versi {__version__}", "mono"),
-            ("Aplikasi untuk merekam paduan suara SATB dan piano secara bergiliran, lalu membuat master "
-             "siap YouTube dengan satu klik.", "secondary"),
-            ("Komponen pihak ketiga", "field"),
-            ("Qt for Python (PySide6) · LGPL v3", "secondary"),
-            ("PortAudio, libsndfile, FFmpeg · lisensi masing-masing", "secondary"),
-            ("Font Inter dan JetBrains Mono · SIL Open Font License 1.1", "secondary"),
-        ]
         content = QWidget()
         content.setObjectName("scrollContent")
         content.setFixedWidth(880)
@@ -417,19 +417,51 @@ class AboutPage(QWidget):
         lay.setSpacing(10)
         lay.addWidget(label("Tentang Aplikasi", "h2"))
         lay.addSpacing(8)
-        box = card()
-        inner = QVBoxLayout(box)
-        inner.setContentsMargins(24, 22, 24, 22)
-        inner.setSpacing(8)
-        for text, role in lines:
-            w = label(text, role)
-            w.setWordWrap(True)
-            if role == "field":
-                inner.addSpacing(12)
-            inner.addWidget(w)
-        lay.addWidget(box)
+
+        info = card()
+        intro = label("Aplikasi untuk merekam paduan suara SATB dan piano secara bergiliran, lalu membuat master "
+                      "siap YouTube dengan satu klik.", "secondary")
+        intro.setWordWrap(True)
+        info.setLayout(vbox(label("HarmoniSATB Studio", "h3"), 4, label(f"Versi {__version__}", "mono"), 10, intro,
+                            margins=(24, 20, 24, 20)))
+        lay.addWidget(info)
+        lay.addSpacing(6)
+
+        table = QGridLayout()
+        table.setHorizontalSpacing(24)
+        table.setVerticalSpacing(8)
+        for col, head in enumerate(("Komponen", "Versi", "Lisensi", "Dipakai untuk")):
+            table.addWidget(label(head, "field"), 0, col)
+        for row, comp in enumerate(COMPONENTS, start=1):
+            table.addWidget(label(comp.name, "body"), row, 0)
+            table.addWidget(label(version_of(comp) or "—", "mono"), row, 1)
+            table.addWidget(label(comp.license, "secondary"), row, 2)
+            table.addWidget(label(comp.purpose, "secondary"), row, 3)
+        table.setColumnStretch(0, 1)
+        note = label("Teks lisensi lengkap setiap komponen disertakan di folder lisensi aplikasi.", "hint")
+        note.setWordWrap(True)
+        self.licenses_btn = button("Buka Folder Lisensi", "toolbar", "folder", COLORS["text2"], 16)
+        self.logs_btn = button("Buka Folder Log", "toolbar", "folder", COLORS["text2"], 16)
+        folder = licenses_dir()
+        self.licenses_btn.setEnabled(folder is not None)
+        if folder is None:
+            self.licenses_btn.setToolTip("Folder lisensi tersedia pada aplikasi hasil instal.")
+        self.licenses_btn.clicked.connect(lambda: _open_path(licenses_dir()))
+        self.logs_btn.clicked.connect(lambda: _open_path(log_dir()))
+        third = card()
+        third.setLayout(vbox(label("Komponen pihak ketiga", "h3"), 14, table, 14, note, 12,
+                             hbox(self.licenses_btn, 12, self.logs_btn, None), margins=(24, 20, 24, 20)))
+        lay.addWidget(third)
         lay.addStretch(1)
         self.setLayout(hbox(content, None, margins=(48, 24, 48, 24)))
+
+
+def _open_path(path) -> None:
+    if path is not None:
+        path.mkdir(parents=True, exist_ok=True)
+        import os
+
+        os.startfile(str(path))  # noqa: S606 - membuka folder di Windows Explorer
 
 
 class SettingsScreen(QWidget):

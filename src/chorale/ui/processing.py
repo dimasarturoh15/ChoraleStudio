@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import threading
 import time
 
@@ -10,14 +11,14 @@ from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import QFrame, QProgressBar, QVBoxLayout, QWidget
 
 from chorale.dsp.errors import ProcessingCancelled
-from chorale.dsp.produce import STEP_LABELS, produce
-from chorale.dsp.reverb import ROOM_PRESETS
+from chorale.dsp.presets import ROOM_PRESETS, STEP_LABELS
 from chorale.ui import icons, theme
 from chorale.ui.overlay import ModalOverlay
 from chorale.ui.theme import COLORS
 from chorale.ui.widgets import button, hbox, label, refresh_style, vbox
 
 WAITING, RUNNING, DONE, SKIPPED = "menunggu", "berjalan", "selesai", "dilewati"
+log = logging.getLogger("chorale.produce")
 
 
 class ProduceWorker(QThread):
@@ -28,20 +29,29 @@ class ProduceWorker(QThread):
     cancelled = Signal()
     failed = Signal(str)
 
-    def __init__(self, project, parent=None, produce_fn=produce):
+    def __init__(self, project, parent=None, produce_fn=None):
         super().__init__(parent)
         self.project = project
         self.cancel_event = threading.Event()
         self._produce = produce_fn
 
     def run(self) -> None:
+        log.info("Proses produksi dimulai: %s", self.project.folder)
         try:
+            if self._produce is None:
+                # Dimuat di thread pekerja: scipy/pedalboard berat dan tidak boleh memperlambat UI.
+                from chorale.dsp.produce import produce
+                self._produce = produce
             result = self._produce(self.project, progress=self.progressed.emit, cancel=self.cancel_event,
                                    verify=True)
+            log.info("Proses selesai dalam %.1f s: %.2f LUFS, %.2f dBTP -> %s", result.seconds,
+                     result.mastered.integrated_lufs, result.mastered.true_peak_dbtp, result.wav_path)
             self.succeeded.emit(result)
         except ProcessingCancelled:
+            log.info("Proses produksi dibatalkan pengguna")
             self.cancelled.emit()
         except Exception as exc:  # noqa: BLE001
+            log.exception("Proses produksi gagal")
             self.failed.emit(str(exc) or exc.__class__.__name__)
 
 
@@ -108,7 +118,7 @@ class ProcessingOverlay(ModalOverlay):
     def __init__(self, parent: QWidget):
         super().__init__(parent, 720)
         self.worker: ProduceWorker | None = None
-        self.produce_fn = produce
+        self.produce_fn = None  # None = chorale.dsp.produce.produce (dimuat saat dibutuhkan)
         self.subtitle = label("", "subtitle")
         self.bar = QProgressBar()
         self.bar.setObjectName("produceBar")

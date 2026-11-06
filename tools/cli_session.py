@@ -214,7 +214,7 @@ def cmd_rekam(args) -> int:
     print(f"  Sound card : {selection.mode_label}, buffer {args.buffer}")
     print(f"  Tempo {project.tempo} BPM, {project.time_signature}, hitungan awal {project.count_in_bars} bar")
     if args.track != "piano":
-        print("  Suara Anda sendiri TIDAK diputar aplikasi; dengarkan lewat kenop direct monitor.")
+        print("  Suara Anda sendiri TIDAK diputar aplikasi; dengarkan lewat tombol direct monitor.")
     for w in session.warnings:
         print(f"  PERINGATAN: {w}")
 

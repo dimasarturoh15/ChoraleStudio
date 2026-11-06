@@ -12,7 +12,7 @@ Versi 1.1 menyesuaikan PRD dengan hardware yang benar-benar dimiliki (SPL Audio 
 |---|---|---|
 | Sound card | SPL Crimson/Creon (ASIO wajib) | SPL Audio SC202HD; ASIO jika tersedia, WASAPI Exclusive sebagai cadangan |
 | Pitch correction | Wajib (polifonik ±15 cents) | Dihapus dari v1.1; nada meleset diatasi dengan re-take |
-| Monitoring vokal | Software "zero-latency" + kenop virtual | Kenop direct monitor fisik di sound card |
+| Monitoring vokal | Software "zero-latency" + tombol virtual | Tombol direct monitor fisik di sound card |
 | Balance antar-track | Tidak ditentukan | Auto-balance + slider volume per track |
 | Target mastering | LUFS, TP, LRA setara (bertabrakan) | Prioritas: TP > LUFS > LRA (LRA hanya dilaporkan) |
 | Reverb | Tanpa rasio wet/dry | Wet/dry ditetapkan + 3 preset ruang |
@@ -48,12 +48,12 @@ Aplikasi mendeteksi driver secara otomatis dengan urutan prioritas berikut:
 2. WASAPI Exclusive (bawaan Windows): pilihan default jika ASIO resmi tidak ada. Tidak perlu instal apa pun.
 3. WASAPI Shared: cadangan terakhir, hanya untuk uji coba.
 
-ASIO4ALL tidak direkomendasikan karena sering bentrok dengan aplikasi lain. Karena penyanyi mendengar suaranya sendiri lewat kenop direct monitor fisik, latensi software sekitar 10–20 ms pada WASAPI tidak mengganggu perekaman.
+ASIO4ALL tidak direkomendasikan karena sering bentrok dengan aplikasi lain. Karena penyanyi mendengar suaranya sendiri lewat tombol direct monitor fisik, latensi software sekitar 10–20 ms pada WASAPI tidak mengganggu perekaman.
 
 ### Hal yang harus dicek pada unit SC202HD
 
 - Jumlah input yang bisa direkam terpisah di Windows (diasumsikan 2 kanal).
-- Ada kenop direct monitor atau mix monitor fisik di panel depan.
+- Ada tombol direct monitor atau mix monitor fisik di panel depan.
 - Driver ASIO resmi tersedia atau tidak.
 - Dapat dikunci di 48 kHz / 24-bit dari pengaturan Windows.
 
@@ -64,7 +64,7 @@ Pengguna membuat satu proyek per lagu, merekam 5 track secara berurutan, lalu me
 1. **Buat/buka proyek**: isi judul lagu, tempo, dan birama. Aplikasi memeriksa sound card, driver, dan sample rate 48 kHz.
 2. **Kalibrasi latensi** (sekali per perangkat): kabel output dihubungkan ke input, aplikasi mengukur jeda rekam-putar otomatis. Hasilnya disimpan untuk semua proyek.
 3. **Rekam Piano/Orgen**: metronom count-in 1–2 bar, lalu piano direkam stereo sebagai track panduan. Metronom boleh dimatikan untuk lagu bertempo bebas.
-4. **Rekam vokal berurutan** (Bass → Tenor → Alto → Sopran): tiap kelompok mendengar piano + suara yang sudah direkam di headphone, dan suaranya sendiri lewat kenop direct monitor sound card.
+4. **Rekam vokal berurutan** (Bass → Tenor → Alto → Sopran): tiap kelompok mendengar piano + suara yang sudah direkam di headphone, dan suaranya sendiri lewat tombol direct monitor sound card.
 5. **Pilih take terbaik**: tiap track bisa direkam ulang berkali-kali; pengguna memilih take aktif dari daftar.
 6. **Proses Produksi & Master**: satu klik menjalankan pembersihan, penyeimbangan, panning, reverb, dan mastering.
 7. **Dengarkan & sesuaikan**: bandingkan Mentah vs Master (volume disamakan). Jika perlu, geser slider volume track atau ganti preset ruang, lalu proses ulang.
@@ -95,8 +95,8 @@ Sembilan kelompok fitur berikut adalah cakupan penuh v1.1; fitur di luar daftar 
 ### FR-3: Monitoring Headphone
 
 - Saat merekam, aplikasi memutar campuran track lain yang tidak di-mute ke output headphone sound card.
-- Suara penyanyi sendiri tidak diputar ulang oleh aplikasi; penyanyi mendengarnya lewat kenop direct monitor fisik sound card.
-- Layar menampilkan petunjuk singkat cara mengatur kenop monitor sebelum merekam vokal.
+- Suara penyanyi sendiri tidak diputar ulang oleh aplikasi; penyanyi mendengarnya lewat tombol direct monitor fisik sound card.
+- Layar menampilkan petunjuk singkat cara menyalakan tombol monitor sebelum merekam vokal.
 - Rekaman baru otomatis digeser sesuai hasil kalibrasi latensi agar sejajar sampel-per-sampel dengan track sebelumnya.
 
 ### FR-4: Metronom & Count-In
@@ -229,7 +229,7 @@ Prosedur ini ditampilkan di aplikasi sebagai panduan langkah demi langkah sebelu
 - 2–4 penyanyi membentuk setengah lingkaran, jarak 35–45 cm dari mic, sama rata untuk semua orang.
 - Pop filter sekitar 7 cm di depan mic.
 - Semua penyanyi aktif memakai headphone closed-back.
-- Kenop direct monitor diatur sampai penyanyi mendengar suaranya sendiri dan musik dengan nyaman; volume headphone secukupnya agar tidak bocor ke mic.
+- Tombol direct monitor dinyalakan agar penyanyi mendengar suaranya sendiri dan musik dengan nyaman; volume headphone secukupnya agar tidak bocor ke mic.
 
 ## 10. Kriteria Penerimaan
 

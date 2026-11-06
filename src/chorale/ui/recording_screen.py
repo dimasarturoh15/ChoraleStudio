@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (
 
 from chorale.audio.meter import to_dbfs
 from chorale.audio.player import audible_tracks, TrackAudio, db_to_gain
-from chorale.dsp.reverb import REVERB_AMOUNT_LABELS, ROOM_PRESETS
+from chorale.dsp.presets import REVERB_AMOUNT_LABELS, ROOM_PRESETS
 from chorale.project.model import TRACK_IDS, VOCAL_TRACK_IDS, Project
 from chorale.settings import AppSettings, save_settings
 from chorale.ui import icons

@@ -44,7 +44,7 @@ SEBELUM MULAI (penting):
   1. Kecilkan volume headphone / lepas headphone.
   2. MATIKAN phantom +48V.
   3. Kabel loopback: OUTPUT sound card -> INPUT 1 (sama seperti saat kalibrasi).
-  4. Putar kenop DIRECT MONITOR ke posisi playback penuh / input nol.
+  4. Matikan tombol DIRECT MONITOR (posisi OFF).
      Jika direct monitor menyala, input ikut keluar lagi ke output dan bisa
      terjadi dengung (feedback) lewat kabel loopback.
 Bunyi yang diputar: klik metronom 120 BPM, sekitar {total:.0f} detik total."""

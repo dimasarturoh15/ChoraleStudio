@@ -14,7 +14,7 @@ Rujukan: [PRD_v1.1.md](PRD_v1.1.md). Daftar segmen di bawah adalah rancangan awa
 | 7 | UI: layar utama perekaman (5 track, transport, take, wizard vokal, error perangkat) | 3 | ✅ Kode, tes & screenshot selesai; uji manual SC202HD menunggu hardware |
 | 8 | UI: Memproses Produksi, Hasil & Ekspor, alur penuh FR-5..FR-9 | 3 | ✅ Selesai (gerbang Sprint 3 lulus dengan audio simulasi/impor; uji SC202HD tertunda) |
 | 9 | Uji lapangan dengan paduan suara, perbaikan bug, uji penerimaan (Bagian 10) | 4 | Belum |
-| 10 | Paket PyInstaller + installer Inno Setup | 4 | Belum |
+| 10 | Paket PyInstaller + installer Inno Setup, log, dokumen uji lapangan (dikerjakan sebagai Segmen 9) | 4 | 🔄 Build PyInstaller selesai & teruji; Setup.exe menunggu Inno Setup terpasang |
 
 ---
 
@@ -72,7 +72,7 @@ Rujukan: [PRD_v1.1.md](PRD_v1.1.md). Daftar segmen di bawah adalah rancangan awa
 | Item | Hasil |
 |---|---|
 | Jumlah input terpisah di Windows | Belum diuji. SC202HD tidak terlihat oleh Windows. |
-| Kenop direct monitor fisik | Menunggu pengecekan manual pengguna |
+| Direct monitor fisik | SC202HD punya tombol ON/OFF (bukan kenop putar); dikonfirmasi pengguna. Keseimbangan suara sendiri vs musik tidak bisa diatur halus di perangkat |
 | Driver ASIO resmi | Build PortAudio ber-ASIO tersedia, tetapi **tidak ada driver ASIO terpasang** di Windows (registry `HKLM\SOFTWARE\ASIO` kosong). |
 | Kunci 48 kHz / 24-bit | Belum diuji |
 | Latensi terukur | Belum diuji |
@@ -465,3 +465,62 @@ Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
 - Sound card dilepas oleh layar perekaman sebelum memproses, lalu dibuka lagi oleh pemutar A/B (output saja) dan kembali ke layar perekaman setelahnya.
 - Verifikasi FFmpeg selalu dijalankan dari UI (hasilnya masuk laporan), paralel dengan encode MP3.
 - Mentah untuk A/B = mixdown sebelum mastering (sama seperti Segmen 5); yang lebih keras dikecilkan.
+
+---
+
+## Segmen 9 — Installer & dokumen uji lapangan (build selesai; Setup.exe menunggu Inno Setup)
+
+**Yang dikerjakan**
+- Versi aplikasi **1.1.0**.
+- `installer/harmonisatb.spec` (PyInstaller onedir, tanpa konsol, ikon): membawa font, ikon, QSS, PortAudio (termasuk build ber-ASIO), libsndfile, FFmpeg 9.0.2 (imageio-ffmpeg), serta metadata paket untuk halaman Tentang. DeepFilterNet tidak dipakai.
+- `tools/build_installer.py`:
+  - PyInstaller → `dist\HarmoniSATB Studio\` + `licenses\` (teks lisensi semua komponen + `THIRD_PARTY_NOTICES.txt`).
+  - Uji jalan **tanpa Python di PATH** (buka/tutup jendela + `--uji-mandiri`).
+  - Inno Setup bila ISCC ada.
+- `installer/HarmoniSATB.iss`:
+  - Satu Setup.exe, instal per pengguna tanpa hak admin (bisa juga untuk semua pengguna).
+  - Shortcut Start Menu & Desktop, uninstaller.
+  - Data `%APPDATA%\HarmoniSATB` dan folder proyek tidak dihapus saat uninstall.
+- `tools/make_icon.py` → `src/chorale/ui/assets/harmonisatb.ico` (not musik, 7 ukuran).
+- `chorale/logging_setup.py`: log berotasi `%APPDATA%\HarmoniSATB\logs\harmonisatb.log` (5 × 1 MB) + `crash.log` (faulthandler). `sys.excepthook` & `threading.excepthook` mencatat traceback lengkap ke log, tetapi pengguna hanya melihat dialog ramah dengan tombol "Buka Folder Log". stdout/stderr dialihkan ke log pada aplikasi tanpa konsol. Peristiwa penting ikut dicatat (sound card, proses produksi, kalibrasi, error buka proyek).
+- Halaman **Tentang Aplikasi**: versi, tabel 14 komponen pihak ketiga (versi, lisensi, kegunaan), "Buka Folder Lisensi", "Buka Folder Log" (`chorale/licenses.py`).
+- `HarmoniSATB Studio.exe --uji-mandiri` (`chorale/selftest.py`): 5 track sintetis → produce → periksa 3 file & target; untuk teknisi di lapangan.
+- **Waktu buka aplikasi dipercepat** dari ±26 s menjadi ±10 s (sumber). Penyebabnya: import `scipy.signal` makan ±11 s di laptop ini. Konstanta UI dipindah ke `dsp/presets.py`; modul DSP dimuat di thread latar 3 detik setelah jendela tampil.
+- Dokumen: `docs/UJI_LAPANGAN.md` (checklist uji untuk orang awam, 10 uji + ringkasan) dan `docs/PANDUAN_PENGGUNA.md` (bergambar, dari instal sampai ekspor). README: cara build & log.
+
+**Hasil build** (Core i5-13500H, 16 GB):
+- Folder aplikasi 328 MB (531 file).
+- Dari `D:\My Project\ChoraleStudio\dist\HarmoniSATB Studio\` (path dengan spasi), PATH tanpa Python: buka/tutup jendela kode 0; `--uji-mandiri` **lulus** (−14,04 LUFS, 3 file valid, verifikasi FFmpeg cocok).
+- Peluncuran pertama setelah build lebih lambat (±20–50 s): Windows Defender memindai file baru.
+
+**Hasil tes akhir**: **241 tes lulus** dalam 88 detik (`pytest -q`, kode keluar 0).
+
+**Benchmark akhir** (`tools/benchmark.py`, lagu 4 menit, 5 track): **34,4 detik** (batas 60 detik) → **LULUS**. Terlama: mastering 24,0 s (limiter oversampling 4x); master -14,1 LUFS / -1,15 dBTP.
+
+**Stress test akhir** (`tools/stress_test.py --minutes 60 --blocksize 256`, Realtek): **LULUS**: 60,01 menit, 0 dropout, 0 sampel hilang di ring buffer, file 60,00 menit PCM_24 (selisih -171 ms dari jam), beban callback rata-rata 7,3% (maks 29,9%), CPU 1,5% total. Total stress test di Realtek kini 3 × 60 menit tanpa dropout.
+
+### Kriteria penerimaan (PRD bagian 10 & NFR bagian 5)
+
+| Kriteria | Target | Status | Bukti / catatan |
+|---|---|---|---|
+| Standar YouTube | TP ≤ −1,0 dBTP pada 100% file uji; −14 ±1 LUFS atau lebih pelan dengan peringatan | ✅ Lulus | 7 sinyal uji ekstrem TP ≤ −1,0; proyek contoh −14,1 LUFS / −1,1 dBTP; peringatan muncul pada materi sangat dinamis; FFmpeg ebur128 cocok (≤ 0,07) |
+| Stabilitas audio | 0 dropout 60 menit, buffer 256 | ✅ Lulus di Realtek · ⏳ SC202HD belum | 3 × 60 menit 0 dropout di Realtek (terakhir 06-11-2026, beban callback rata-rata 7,3%) |
+| Sinkronisasi | Selisih antar-track ≤ 1 ms | ⏳ Belum diuji di hardware | Simulasi loopback 5 track: 0 sampel; `tools/sync_test.py` siap, butuh SC202HD + kabel loopback |
+| Kualitas vokal | Tanpa artefak denoise & comb-filtering | ⏳ Belum diuji | Butuh rekaman nyanyian asli + uji dengar 2 orang (Uji 5 di UJI_LAPANGAN.md). DeepFilterNet tidak dipakai, jadi tidak ada artefak denoise |
+| Kecepatan | Lagu 4 menit ≤ 60 s di Core i5 | ✅ Lulus | Lihat benchmark akhir di atas (tanpa peredam derau) |
+| Ekspor | WAV 24/48 & MP3 320 valid, ekor utuh, tidak menimpa | ✅ Lulus | Tes header, decode MP3, ekor −60 dB + 1 s, nama unik (`-2`) |
+| Kegunaan | Anggota baru menyelesaikan 1 lagu dengan panduan layar | ⏳ Belum diuji | Uji 4 di UJI_LAPANGAN.md |
+| NFR: Keamanan rekaman | ≤ 1 s hilang jika listrik padam | ✅ Lulus (simulasi) · ⏳ cabut daya nyata belum | Header WAV diperbarui tiap ≤ 1 s; tes salinan saat merekam; sound card "dicabut" tersimpan sampai blok terakhir |
+| NFR: Kemudahan pakai | Tombol rekam ≥ 64 px, tema gelap kontras tinggi | ✅ Tombol 72 px, tema gelap · ⏳ uji keterbacaan 1,5 m belum | |
+| NFR: Instalasi | Satu Setup.exe, tanpa Python, ≤ 1,5 GB | 🔄 Sebagian | Build berjalan tanpa Python di PATH (328 MB). **Setup.exe belum dibuat: Inno Setup belum terpasang** |
+| NFR: Offline | Semua fitur tanpa internet | ✅ Lulus (desain) | Tidak ada kode jaringan di aplikasi; uji dengan Wi-Fi mati = Uji 10 |
+
+**Masalah terbuka**
+- **Inno Setup 6 belum terpasang** di laptop ini, jadi Setup.exe belum bisa dibuat dan diuji. Tag `v1.1.0` ditunda sampai Setup.exe terpasang dan berjalan.
+- **Lisensi:** pedalboard (GPL v3) dan build FFmpeg (GPL v3) ikut dalam aplikasi. Jika installer dibagikan ke pihak lain, aplikasi secara keseluruhan perlu mengikuti ketentuan GPL v3 (kode sumber harus bisa diperoleh penerima). Keputusan ada di pemilik proyek.
+- Semua uji hardware SC202HD (kalibrasi, sinkron, stress, rekam suara asli, cabut USB) masih menunggu perangkat.
+
+**Keputusan pengguna (06-11-2026)**
+- SC202HD **tidak punya kenop** direct monitor; yang ada **tombol ON/OFF**. Aturan "suara penyanyi tidak diputar software" tetap berlaku. Atas persetujuan pengguna, semua teks "putar kenop direct monitor" diganti menjadi "nyalakan tombol direct monitor (ON)": layar Persiapan Rekam Vokal, langkah kalibrasi (OFF), skrip uji, PRD, CLAUDE.md, panduan pengguna.
+- **DeepFilterNet ditunda** sampai rekaman nyanyian asli dari SC202HD bisa didengar. Alasannya: dirancang untuk suara bicara (berisiko artefak pada vokal panjang), menambah ukuran installer, dan memperlambat proses.
+- SC202HD dijadwalkan disambungkan **07-11-2026**.
