@@ -10,8 +10,8 @@ Rujukan: [PRD_v1.1.md](PRD_v1.1.md). Daftar segmen di bawah adalah rancangan awa
 | 3 | Metronom & count-in (FR-4), kompensasi latensi sinkron ≤ 1 ms (FR-3), CLI 5 track, stress test 60 menit | 1 | 🔄 Kode & tes selesai, uji SC202HD menunggu hardware |
 | 4 | Pascaproduksi FR-5 & FR-6: HPF, EQ, kompresor, penyeimbang, panning, reverb | 2 | ✅ Selesai; DeepFilterNet ditunda (menunggu keputusan pengguna) |
 | 5 | Mastering FR-7, pengukuran (LUFS/TP/LRA), ekspor & laporan FR-8, verifikasi ebur128 | 2 | ✅ Selesai (gerbang Sprint 2 lulus, dengan peredam derau dilewati) |
-| 6 | UI PySide6: jendela utama 5 bilah track, VU meter, transport | 3 | Belum |
-| 7 | UI: daftar proyek, proyek baru, pengaturan perangkat, panduan rekam, proses & hasil/A-B | 3 | Belum |
+| 6 | UI PySide6: kerangka, tema, daftar proyek, proyek baru, pengaturan + kalibrasi | 3 | ✅ Selesai |
+| 7 | UI: layar rekam 5 track, VU meter, transport, daftar take, panduan rekam, proses & hasil/A-B | 3 | Belum |
 | 8 | Uji lapangan dengan paduan suara, perbaikan bug, uji penerimaan (Bagian 10) | 4 | Belum |
 | 9 | Paket PyInstaller + installer Inno Setup | 4 | Belum |
 
@@ -261,3 +261,64 @@ Rujukan: [PRD_v1.1.md](PRD_v1.1.md). Daftar segmen di bawah adalah rancangan awa
 - Nilai LUFS di laporan dari pyloudnorm, sesuai permintaan. Versi cepat hanya untuk iterasi pencarian gain.
 - Mixdown "Mentah" untuk A/B = hasil rantai Segmen 4 sebelum mastering, dipotong ekornya dengan aturan yang sama.
 - Status laporan "Siap YouTube" = TP ≤ −1,0 dan LUFS dalam −14 ±1.
+
+---
+
+## Segmen 6 — Kerangka UI, daftar proyek, pengaturan (selesai)
+
+**Yang dikerjakan**
+- `ui/theme.py` + `ui/style.qss`: token warna dan warna track sesuai mockup, radius 4/6/8, teks minimal 13 px. Font Inter 3.19 (OTF) dan JetBrains Mono 2.304 (TTF) beserta lisensi OFL ada di `ui/fonts/` (diunduh dari jsDelivr karena github.com sedang tidak terjangkau). Cadangan: Segoe UI / Consolas.
+- `ui/icons.py`: ikon garis buatan sendiri (SVG, dirender QtSvg, tajam di HiDPI).
+- `ui/widgets.py`: kontrol bersegmen (dengan sublabel "Tidak tersedia"), sakelar, stepper tempo, 5 titik status, meter level dengan skala −42/−12/0 dB, bilah atas.
+- `ui/main_window.py`: 1440×900, minimal 1280×800, QStackedWidget (Daftar Proyek, Pengaturan, layar proyek sementara).
+- `ui/project_list.py`: data dari recent.json lewat `store.read_summary` (hanya membaca proyek.json, tanpa memulihkan atau menyimpan apa pun). Tanggal = waktu terakhir proyek diubah. "Buka Proyek Lain…" memakai dialog pilih folder.
+- `ui/new_project.py`: lapisan modal di atas jendela (latar digelapkan, seperti mockup). Validasi judul tidak kosong; tempo dibatasi 40–240 (ketik 300 → 240). Folder default `Documents\HarmoniSATB\<judul>` (Documents dicari lewat Windows, jadi ikut jika dipindah ke OneDrive) dan bisa diganti lewat "Ubah…".
+- `ui/settings_screen.py`:
+  - Navigasi samping (Perangkat Audio / Tentang Aplikasi).
+  - Pilihan sound card, mode driver (ASIO nonaktif + "Tidak tersedia" jika tidak ada), Sample Rate 48.000 Hz dan Bit Depth 24-bit terkunci, ukuran buffer.
+  - Pemetaan input dengan meter live (`audio/monitor.py`, 30 fps lewat QTimer).
+  - Kalibrasi latensi di QThread, dengan dialog konfirmasi keselamatan, progres "Mengukur… n/5", dan hasil "12.4 ms ✓ Akurat · Terakhir dikalibrasi …".
+  - Simpan/Batal.
+- `chorale/settings.py`: `%APPDATA%\HarmoniSATB\settings.json` (perangkat, mode driver, buffer, pemetaan input, folder proyek).
+- `audio/device.py`: `list_sound_cards()` (gabungan input/output per kartu) dan `select_device(..., mode=)`.
+- Logika kalibrasi dipindah ke `audio/calibration.py` (`measure_latency`, `accuracy_label`, `SAFETY_STEPS`). `tools/calibrate_latency.py` kini memakainya.
+- `python -m chorale` (paket dipasang editable: `pip install -e .`). `tools/ui_screenshots.py` membuat screenshot dengan data contoh di folder sementara.
+
+**Hasil tes**: 206 tes lulus. `tests/test_ui.py` (Qt offscreen, tanpa sound card) menguji:
+- Daftar sound card dan mode paksa, pengaturan simpan/baca/validasi.
+- `read_summary` tidak mengubah proyek.
+- Kalibrasi lewat loopback palsu (700 sampel, selisih 1 → "Akurat").
+- Font dan token QSS.
+- Daftar proyek (isi dan kosong).
+- Proyek baru (validasi, batas tempo, nilai tersimpan, teks persis mockup).
+- Pengaturan (ASIO "Tidak tersedia", simpan, tampilan hasil kalibrasi).
+- Navigasi jendela utama.
+
+Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
+
+**Screenshot**: `docs/screenshots/01`–`07` (1440×900 dan 1280×800, layar 175%).
+
+**Perbandingan dengan mockup**
+
+| Bagian | Perbedaan | Alasan |
+|---|---|---|
+| Skala meter, sublabel "Tidak tersedia" | 13 px (mockup 10–11 px) | Aturan teks minimal 13 px |
+| Meter level | Lebar 180 px (mockup 110 px) | Label 13 px tidak muat di 110 px tanpa bertumpuk |
+| Nama perangkat | Nama dari Windows, mis. "Realtek(R) Audio"; SC202HD akan tampil "SPL Audio SC202HD" (tanpa "(USB)") | Belum ada SC202HD tersambung; nama diambil apa adanya dari driver |
+| Kalibrasi | Menampilkan "— Belum dikalibrasi" | Belum ada kalibrasi untuk perangkat ini (mockup memakai contoh 12.4 ms) |
+| Teks tambahan | "Disimpan di … Ubah…" (Proyek Baru), "Judul lagu tidak boleh kosong.", "Belum ada proyek…", dialog keselamatan sebelum kalibrasi, pesan error perangkat, isi halaman Tentang Aplikasi | Diminta (folder bisa diganti) atau dibutuhkan untuk keadaan yang tidak ada di mockup |
+| Ikon | Digambar sendiri, bentuk sedikit berbeda | Menghindari masalah lisensi ikon |
+| Membuka proyek | Layar sementara | Layar rekam 5 track = Segmen 7 |
+| Jarak vertikal Pengaturan | Sedikit lebih rapat dari mockup | Agar Batal/Simpan muat di 900 px tanpa scroll |
+| Cacat mockup | Tidak ditiru: judul "Bapa Engkau Sungguh Baik" utuh, tidak ada teks terpotong di 1280×800 | Aturan CLAUDE.md |
+
+**Masalah terbuka**
+- Path yang sangat panjang di "Disimpan di …" dipendekkan di tengah dengan "…" (path lengkap ada di tooltip). Path di bawah Documents tampil pendek ("Documents\HarmoniSATB\<judul>").
+- FFmpeg dari imageio-ffmpeg adalah build GPL. Ini perlu diperhatikan saat membuat installer (Segmen 9).
+- Meter Pengaturan membuka input sound card secara eksklusif selama layar Pengaturan terbuka, dan ditutup otomatis saat keluar atau saat kalibrasi.
+
+**Keputusan teknis**
+- Dialog Proyek Baru dibuat sebagai lapisan di dalam jendela, bukan jendela terpisah, agar latar digelapkan persis seperti mockup.
+- Ukuran font diatur lewat QSS (`role`), karena `setFont` kalah oleh aturan QSS global.
+- Jarak ikon-teks pada tombol dibuat dengan dua spasi di depan teks (QSS Qt tidak punya pengaturan jarak ikon).
+- Mode driver disimpan hanya jika pengguna mengubahnya; selain itu tetap otomatis (ASIO → WASAPI Exclusive → Shared).

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -111,3 +112,56 @@ def list_recent(path: Path | None = None) -> list[dict]:
     """Daftar proyek terakhir yang foldernya masih ada."""
     return [e for e in _read_recent(path or recent_file())
             if (Path(e.get("path", "")) / PROJECT_FILE).is_file()]
+
+
+@dataclass(frozen=True)
+class ProjectSummary:
+    """Ringkasan untuk daftar proyek (dibaca tanpa membuka/menyimpan proyek)."""
+
+    folder: Path
+    title: str
+    tempo: int
+    time_signature: str
+    modified_at: str
+    recorded: tuple[bool, ...]  # urutan TRACK_IDS
+
+
+def read_summary(folder: Path) -> ProjectSummary | None:
+    """Baca proyek.json saja; None jika folder bukan proyek atau file rusak."""
+    try:
+        data = json.loads((Path(folder) / PROJECT_FILE).read_text(encoding="utf-8"))
+        tracks = {t["id"]: t for t in data.get("tracks", [])}
+        recorded = tuple(bool(tracks.get(tid, {}).get("active_take_id")) for tid in TRACK_IDS)
+        return ProjectSummary(Path(folder), str(data["title"]), int(data.get("tempo", 0)),
+                              str(data.get("time_signature", "")), str(data.get("modified_at", "")), recorded)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        return None
+
+
+def recent_summaries(path: Path | None = None) -> list[ProjectSummary]:
+    """Ringkasan proyek terakhir (urutan recent.json), yang foldernya masih valid."""
+    out = []
+    for entry in list_recent(path):
+        summary = read_summary(Path(entry["path"]))
+        if summary is not None:
+            out.append(summary)
+    return out
+
+
+def documents_dir() -> Path:
+    """Folder Documents milik pengguna (mengikuti pemindahan ke OneDrive dsb. di Windows)."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        buf = ctypes.create_unicode_buffer(wintypes.MAX_PATH)
+        if ctypes.windll.shell32.SHGetFolderPathW(None, 5, None, 0, buf) == 0 and buf.value:
+            return Path(buf.value)
+    except (AttributeError, OSError):
+        pass
+    return Path.home() / "Documents"
+
+
+def default_projects_dir() -> Path:
+    """Documents/HarmoniSATB."""
+    return documents_dir() / "HarmoniSATB"

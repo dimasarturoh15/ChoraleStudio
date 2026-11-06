@@ -30,3 +30,6 @@ recordings/
 .vscode/settings.json
 Thumbs.db
 .DS_Store
+
+# Paket editable
+*.egg-info/

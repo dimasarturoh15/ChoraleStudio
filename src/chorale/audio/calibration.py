@@ -126,3 +126,125 @@ def find_calibration(input_device: str, output_device: str, hostapi: str, exclus
     """Cari hasil kalibrasi untuk kombinasi perangkat, mode, dan buffer yang persis sama."""
     key = (input_device, output_device, hostapi, exclusive, samplerate, blocksize)
     return next((e for e in load_calibrations(path) if e.key() == key), None)
+
+
+# ----- pengukuran dengan sound card (dipakai layar Pengaturan dan tools/calibrate_latency.py) -----
+
+MIN_QUALITY = 20.0
+ACCURATE_SPREAD = 1      # sampel: "Akurat"
+ACCEPTABLE_SPREAD = 48   # sampel (1 ms): masih memenuhi PRD
+
+SAFETY_STEPS = (
+    "Kecilkan volume headphone ke nol atau lepas headphone dari kepala.",
+    "Matikan phantom +48V di sound card.",
+    "Sambungkan kabel dari Output sound card ke Input 1, dan kecilkan gain input.",
+    "Kecilkan kenop direct monitor agar suara input tidak ikut terdengar.",
+)
+
+
+class CalibrationError(Exception):
+    """Kalibrasi gagal; pesan bisa langsung ditampilkan ke pengguna."""
+
+
+class CalibrationCancelled(Exception):
+    pass
+
+
+def make_stimulus(samplerate: int = 48000) -> np.ndarray:
+    """0,25 s hening + sweep 0,5 s + 1 s hening (cukup untuk latensi sampai ~1 s)."""
+    sweep = make_sweep(samplerate)
+    return np.concatenate([np.zeros(int(0.25 * samplerate), np.float32), sweep,
+                           np.zeros(int(1.0 * samplerate), np.float32)])
+
+
+def play_record_once(selection, stimulus: np.ndarray, blocksize: int) -> tuple[np.ndarray, float, int]:
+    """Putar stimulus ke semua output sambil merekam semua input dalam satu stream.
+
+    Kembalikan (rekaman, latensi laporan PortAudio dalam detik, jumlah blok bermasalah).
+    """
+    import time
+
+    import sounddevice as sd
+
+    from chorale.audio.device import open_duplex_stream
+
+    total = len(stimulus)
+    in_ch, out_ch = selection.input_channels, selection.output_channels
+    play = np.repeat(stimulus[:, None], out_ch, axis=1).astype(np.float32)
+    rec = np.zeros((total, in_ch), dtype=np.float32)
+    pos = [0]
+    flags = [0]
+
+    def callback(indata, outdata, frames, t, status):
+        if status:
+            flags[0] += 1
+        start = pos[0]
+        n = min(frames, total - start)
+        if n > 0:
+            outdata[:n] = play[start:start + n]
+            rec[start:start + n] = indata[:n]
+        if n < frames:
+            outdata[n:] = 0
+        pos[0] = start + frames
+        if pos[0] >= total:
+            raise sd.CallbackStop
+
+    stream = open_duplex_stream(selection, callback, blocksize)
+    try:
+        reported = sum(stream.latency)
+        stream.start()
+        deadline = time.monotonic() + total / 48000 + 3.0
+        while stream.active:
+            if time.monotonic() > deadline:
+                raise CalibrationError("Sound card berhenti merespons saat kalibrasi. Cabut-colok lalu coba lagi.")
+            time.sleep(0.02)
+    finally:
+        stream.close()
+    return rec, reported, flags[0]
+
+
+def measure_latency(selection, blocksize: int, runs: int = 5, progress=None, cancel=None,
+                    samplerate: int = 48000) -> CalibrationResult:
+    """Ukur latensi round-trip lewat kabel loopback, `runs` kali dengan stream baru tiap kali.
+
+    progress(percobaan_ke, jumlah, jeda_sampel). cancel: fungsi/Event untuk membatalkan.
+    Melempar CalibrationError jika sinyal uji tidak tertangkap.
+    """
+    from datetime import datetime
+
+    is_cancelled = getattr(cancel, "is_set", cancel)
+    stimulus = make_stimulus(samplerate)
+    lags: list[int] = []
+    reported_ms: list[float] = []
+    for run in range(1, runs + 1):
+        if is_cancelled is not None and is_cancelled():
+            raise CalibrationCancelled()
+        rec, reported, _ = play_record_once(selection, stimulus, blocksize)
+        estimates = [estimate_delay(rec[:, c], stimulus) for c in range(rec.shape[1])]
+        best = max(estimates, key=lambda e: e.quality)
+        if best.quality < MIN_QUALITY:
+            raise CalibrationError(
+                "Sinyal uji tidak tertangkap. Pastikan kabel dari Output ke Input 1 terpasang, "
+                "gain input tidak nol, dan sound card yang dipilih benar.")
+        lags.append(best.lag_samples)
+        reported_ms.append(reported * 1000)
+        if progress:
+            progress(run, runs, best.lag_samples)
+    median = int(np.median(lags))
+    return CalibrationResult(
+        input_device=selection.input.name, output_device=selection.output.name,
+        hostapi=selection.hostapi, exclusive=selection.exclusive, samplerate=samplerate,
+        blocksize=blocksize, latency_samples=median, latency_ms=round(median / samplerate * 1000, 3),
+        runs_samples=lags, spread_samples=max(lags) - min(lags),
+        reported_latency_ms=round(float(np.mean(reported_ms)), 3),
+        date=datetime.now().isoformat(timespec="seconds"),
+    )
+
+
+def accuracy_label(result: CalibrationResult) -> tuple[str, str]:
+    """(teks, tingkat) untuk tampilan: tingkat 'baik', 'cukup', atau 'buruk'."""
+    if result.spread_samples <= ACCURATE_SPREAD:
+        return "Akurat", "baik"
+    if result.spread_samples <= ACCEPTABLE_SPREAD:
+        return "Cukup", "cukup"
+    return "Tidak konsisten", "buruk"

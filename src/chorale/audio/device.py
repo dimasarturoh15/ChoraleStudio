@@ -24,6 +24,11 @@ HOSTAPI_ASIO = "ASIO"
 HOSTAPI_WASAPI = "Windows WASAPI"
 HOSTAPI_PRIORITY = (HOSTAPI_ASIO, HOSTAPI_WASAPI)
 
+MODE_ASIO = "asio"
+MODE_EXCLUSIVE = "wasapi_exclusive"
+MODE_SHARED = "wasapi_shared"
+MODE_LABELS = {MODE_ASIO: "ASIO", MODE_EXCLUSIVE: "WASAPI Exclusive", MODE_SHARED: "WASAPI Shared"}
+
 MSG_NOT_FOUND = (
     "Sound card tidak ditemukan. Pastikan kabel USB tercolok (sebaiknya langsung ke laptop, "
     "bukan lewat hub), lampu sound card menyala, dan perangkat muncul di Pengaturan > Sistem > Suara."
@@ -101,6 +106,12 @@ class DeviceSelection:
     exclusive: bool
 
     @property
+    def mode(self) -> str:
+        if self.hostapi == HOSTAPI_ASIO:
+            return MODE_ASIO
+        return MODE_EXCLUSIVE if self.exclusive else MODE_SHARED
+
+    @property
     def mode_label(self) -> str:
         if self.hostapi == HOSTAPI_ASIO:
             return "ASIO"
@@ -171,6 +182,51 @@ def find_io_pair(
     return best_in, best_out
 
 
+@dataclass(frozen=True)
+class SoundCard:
+    """Satu sound card fisik, dengan mode driver yang tersedia untuknya."""
+
+    name: str
+    modes: tuple[str, ...]
+    max_input_channels: int
+    max_output_channels: int
+
+
+def card_name(device_name: str) -> str:
+    """Nama kartu dari nama perangkat WASAPI, mis. 'Microphone (SPL Audio SC202HD)' -> 'SPL Audio SC202HD'."""
+    start, end = device_name.find("("), device_name.rfind(")")
+    if 0 <= start < end:
+        inner = device_name[start + 1:end].strip()
+        if inner:
+            return inner
+    return device_name.strip()
+
+
+def list_sound_cards(devices: list[DeviceInfo] | None = None) -> list[SoundCard]:
+    """Sound card yang punya input DAN output di ASIO atau WASAPI, diurutkan menurut nama."""
+    devices = list_devices() if devices is None else devices
+    cards: dict[str, dict] = {}
+    for d in devices:
+        if d.hostapi not in (HOSTAPI_ASIO, HOSTAPI_WASAPI):
+            continue
+        name = card_name(d.name) if d.hostapi == HOSTAPI_WASAPI else d.name
+        c = cards.setdefault(name, {"modes": set(), "in": {}, "out": {}})
+        c["in"][d.hostapi] = max(c["in"].get(d.hostapi, 0), d.max_input_channels)
+        c["out"][d.hostapi] = max(c["out"].get(d.hostapi, 0), d.max_output_channels)
+    result = []
+    for name, c in cards.items():
+        modes = []
+        if c["in"].get(HOSTAPI_ASIO) and c["out"].get(HOSTAPI_ASIO):
+            modes.append(MODE_ASIO)
+        if c["in"].get(HOSTAPI_WASAPI) and c["out"].get(HOSTAPI_WASAPI):
+            modes += [MODE_EXCLUSIVE, MODE_SHARED]
+        if modes:
+            result.append(SoundCard(name, tuple(modes), max(c["in"].values()), max(c["out"].values())))
+    target = [c for c in result if matches_keyword(c.name)]
+    rest = sorted((c for c in result if not matches_keyword(c.name)), key=lambda c: c.name.lower())
+    return target + rest
+
+
 def _wasapi(exclusive: bool) -> sd.WasapiSettings:
     return sd.WasapiSettings(exclusive=exclusive)
 
@@ -201,9 +257,11 @@ def select_device(
     keywords: tuple[str, ...] | str = TARGET_KEYWORDS,
     devices: list[DeviceInfo] | None = None,
     accepts: Callable[[DeviceSelection], bool] = _accepts,
+    mode: str | None = None,
 ) -> DeviceSelection:
     """Pilih perangkat dengan urutan ASIO -> WASAPI Exclusive -> WASAPI Shared.
 
+    mode: paksa satu mode (MODE_ASIO / MODE_EXCLUSIVE / MODE_SHARED); None = otomatis.
     Melempar AudioDeviceError dengan pesan ramah jika perangkat tidak ada atau
     tidak bisa berjalan di 48 kHz.
     """
@@ -216,6 +274,10 @@ def select_device(
     if dev_in and dev_out:
         candidates.append(DeviceSelection(HOSTAPI_WASAPI, dev_in, dev_out, exclusive=True))
         candidates.append(DeviceSelection(HOSTAPI_WASAPI, dev_in, dev_out, exclusive=False))
+    if mode is not None:
+        candidates = [c for c in candidates if c.mode == mode]
+        if not candidates:
+            raise AudioDeviceError(f"Mode {MODE_LABELS.get(mode, mode)} tidak tersedia untuk sound card ini.")
     if not candidates:
         raise AudioDeviceError(MSG_NOT_FOUND)
 

@@ -1,0 +1,150 @@
+/* Tema gelap HarmoniSATB Studio. Token @nama diganti oleh theme.stylesheet(). */
+
+QWidget {
+    color: @text;
+    font-family: @font_ui;
+    font-size: 14px;
+}
+
+QMainWindow, QWidget#screen, QScrollArea, QScrollArea > QWidget > QWidget#scrollContent {
+    background: @app;
+}
+
+QScrollArea { border: none; }
+
+QLabel { background: transparent; }
+
+/* ----- teks ----- */
+QLabel[role="h1"] { font-size: 28px; font-weight: 700; }
+QLabel[role="h2"] { font-size: 24px; font-weight: 700; }
+QLabel[role="h3"] { font-size: 18px; font-weight: 600; }
+QLabel[role="rowTitle"] { font-size: 18px; font-weight: 600; }
+QLabel[role="appTitle"] { font-size: 20px; font-weight: 600; }
+QLabel[role="subtitle"] { font-size: 16px; color: @text2; }
+QLabel[role="section"] { font-size: 14px; font-weight: 500; color: @text2; letter-spacing: 1px; }
+QLabel[role="field"] { font-size: 14px; font-weight: 500; color: @text2; }
+QLabel[role="hint"] { font-size: 13px; color: @text2; }
+QLabel[role="hintMono"] { font-size: 13px; color: @text2; font-family: @font_mono; }
+QLabel[role="body"] { font-size: 15px; font-weight: 500; }
+QLabel[role="secondary"] { font-size: 14px; color: @text2; }
+QLabel[role="mono"] { font-size: 14px; color: @text2; font-family: @font_mono; }
+QLabel[role="monoValue"] { font-size: 14px; font-weight: 500; font-family: @font_mono; }
+QLabel[role="error"] { font-size: 13px; color: @red; }
+
+/* ----- bilah atas ----- */
+QFrame#topBar {
+    background: @panel;
+    border: none;
+    border-bottom: 1px solid @border;
+}
+
+/* ----- kartu & panel ----- */
+QFrame#card {
+    background: @panel;
+    border: 1px solid @border;
+    border-radius: 8px;
+}
+QFrame#inset {
+    background: @raised;
+    border: 1px solid @border;
+    border-radius: 8px;
+}
+QFrame#lockedField {
+    background: rgba(31, 38, 48, 0.7);
+    border: 1px solid @border;
+    border-radius: 8px;
+}
+QFrame#separator { background: rgba(42, 51, 64, 0.6); border: none; max-height: 1px; min-height: 1px; }
+
+/* ----- tombol ----- */
+QPushButton {
+    border-radius: 8px;
+    padding: 0 20px;
+    min-height: 48px;
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+}
+QPushButton[variant="primary"] { background: @blue; color: #FFFFFF; font-weight: 600; border: none; }
+QPushButton[variant="primary"]:hover { background: @blue_hover; }
+QPushButton[variant="primary"]:disabled { background: #24467A; color: rgba(255, 255, 255, 0.55); }
+QPushButton[variant="hero"] {
+    background: @blue; color: #FFFFFF; font-weight: 600; border: none;
+    border-radius: 12px; min-height: 56px; padding: 0 32px; font-size: 16px;
+}
+QPushButton[variant="hero"]:hover { background: @blue_hover; }
+QPushButton[variant="secondary"] { background: transparent; color: @text; border: 1px solid @border; }
+QPushButton[variant="secondary"]:hover { background: @raised; }
+QPushButton[variant="toolbar"] {
+    background: @raised; color: @text; border: 1px solid @border;
+    min-height: 34px; padding: 0 12px; font-size: 14px; font-weight: 400;
+}
+QPushButton[variant="toolbar"]:hover { background: @border; }
+QPushButton[variant="square"] {
+    background: @raised; border: 1px solid @border; min-height: 36px; min-width: 36px;
+    max-height: 36px; max-width: 36px; padding: 0;
+}
+QPushButton[variant="square"]:hover { background: @border; }
+QPushButton[variant="link"] {
+    background: transparent; border: none; color: @text2; font-size: 16px; font-weight: 400;
+    padding: 0; min-height: 28px; text-align: left;
+}
+QPushButton[variant="link"]:hover { color: @text; }
+QPushButton[variant="icon"] {
+    background: transparent; border: none; min-height: 32px; min-width: 32px; padding: 0; border-radius: 4px;
+}
+QPushButton[variant="icon"]:hover { background: @border; }
+QPushButton[variant="step"] {
+    background: transparent; border: none; color: @text2; min-height: 32px; min-width: 32px;
+    max-width: 32px; padding: 0; border-radius: 4px; font-size: 18px; font-weight: 700;
+}
+QPushButton[variant="step"]:hover { color: @text; background: @border; }
+
+/* ----- navigasi samping ----- */
+QPushButton[variant="nav"] {
+    background: transparent; border: none; border-left: 3px solid transparent; border-radius: 0;
+    color: @text2; text-align: left; padding: 0 17px; font-size: 15px; font-weight: 400;
+}
+QPushButton[variant="nav"]:hover { color: @text; background: rgba(31, 38, 48, 0.5); }
+QPushButton[variant="nav"]:checked { background: @raised; border-left: 3px solid @blue; color: #FFFFFF; font-weight: 500; }
+QFrame#sideNav { background: @panel; border: none; border-right: 1px solid @border; }
+
+/* ----- isian ----- */
+QLineEdit {
+    background: @raised; border: 1px solid @border; border-radius: 8px;
+    min-height: 46px; padding: 0 16px; font-size: 16px; selection-background-color: @blue;
+}
+QLineEdit:focus { border: 1px solid @blue; }
+QLineEdit[invalid="true"] { border: 1px solid @red; }
+
+QLineEdit#stepperEdit {
+    background: transparent; border: none; min-height: 0; padding: 0;
+    font-family: @font_mono; font-size: 18px; font-weight: 600;
+}
+
+QComboBox {
+    background: @raised; border: 1px solid @border; border-radius: 8px;
+    min-height: 42px; padding: 0 16px; font-size: 15px;
+}
+QComboBox[compact="true"] { min-height: 38px; padding: 0 12px; font-size: 14px; }
+QComboBox[mono="true"] { font-family: @font_mono; font-size: 14px; }
+QComboBox:hover { border: 1px solid #4A5566; }
+QComboBox:disabled { color: @text2; }
+QComboBox::drop-down { border: none; width: 40px; }
+QComboBox::down-arrow { image: url(@icon_chevron_down); width: 20px; height: 20px; }
+QComboBox QAbstractItemView {
+    background: @raised; border: 1px solid @border; selection-background-color: @blue;
+    selection-color: #FFFFFF; outline: none; padding: 4px;
+}
+
+QScrollBar:vertical { background: transparent; width: 10px; margin: 0; }
+QScrollBar::handle:vertical { background: @border; border-radius: 5px; min-height: 40px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: transparent; }
+
+QToolTip { background: @raised; color: @text; border: 1px solid @border; padding: 6px; font-size: 13px; }
+
+QMessageBox { background: @panel; }
+QMessageBox QLabel { font-size: 14px; }
+QMessageBox QPushButton { min-width: 96px; min-height: 40px; background: @raised; border: 1px solid @border; }
+QMessageBox QPushButton:default { background: @blue; border: none; color: #FFFFFF; }

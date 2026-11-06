@@ -20,6 +20,13 @@ cd "D:\My Project\ChoraleStudio"
 py -3.12 -m venv .venv
 .venv\Scripts\python -m pip install --upgrade pip
 .venv\Scripts\python -m pip install -r requirements.txt
+.venv\Scripts\python -m pip install -e .
+```
+
+## Menjalankan aplikasi
+
+```powershell
+.venv\Scripts\python -m chorale
 ```
 
 ## Menjalankan tes
@@ -52,4 +59,5 @@ py -3.12 -m venv .venv
 .venv\Scripts\python tools\make_demo_project.py     # proyek contoh SATB sintetis
 .venv\Scripts\python tools\process_project.py       # proses proyek -> master WAV + MP3 + laporan
 .venv\Scripts\python tools\benchmark.py            # ukur waktu produce() untuk lagu 4 menit
+.venv\Scripts\python tools\ui_screenshots.py         # screenshot tiap layar -> docs\screenshots
 ```
