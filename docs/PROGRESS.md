@@ -14,7 +14,7 @@ Rujukan: [PRD_v1.1.md](PRD_v1.1.md). Daftar segmen di bawah adalah rancangan awa
 | 7 | UI: layar utama perekaman (5 track, transport, take, wizard vokal, error perangkat) | 3 | ✅ Kode, tes & screenshot selesai; uji manual SC202HD menunggu hardware |
 | 8 | UI: Memproses Produksi, Hasil & Ekspor, alur penuh FR-5..FR-9 | 3 | ✅ Selesai (gerbang Sprint 3 lulus dengan audio simulasi/impor; uji SC202HD tertunda) |
 | 9 | Uji lapangan dengan paduan suara, perbaikan bug, uji penerimaan (Bagian 10) | 4 | Belum |
-| 10 | Paket PyInstaller + installer Inno Setup, log, dokumen uji lapangan (dikerjakan sebagai Segmen 9) | 4 | 🔄 Build PyInstaller selesai & teruji; Setup.exe menunggu Inno Setup terpasang |
+| 10 | Paket PyInstaller + installer Inno Setup, log, dokumen uji lapangan (dikerjakan sebagai Segmen 9) | 4 | ✅ Selesai: Setup.exe 87 MB terinstal & berjalan tanpa Python |
 
 ---
 
@@ -468,7 +468,7 @@ Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
 
 ---
 
-## Segmen 9 — Installer & dokumen uji lapangan (build selesai; Setup.exe menunggu Inno Setup)
+## Segmen 9 — Installer & dokumen uji lapangan ✅
 
 **Yang dikerjakan**
 - Versi aplikasi **1.1.0**.
@@ -512,11 +512,11 @@ Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
 | Kegunaan | Anggota baru menyelesaikan 1 lagu dengan panduan layar | ⏳ Belum diuji | Uji 4 di UJI_LAPANGAN.md |
 | NFR: Keamanan rekaman | ≤ 1 s hilang jika listrik padam | ✅ Lulus (simulasi) · ⏳ cabut daya nyata belum | Header WAV diperbarui tiap ≤ 1 s; tes salinan saat merekam; sound card "dicabut" tersimpan sampai blok terakhir |
 | NFR: Kemudahan pakai | Tombol rekam ≥ 64 px, tema gelap kontras tinggi | ✅ Tombol 72 px, tema gelap · ⏳ uji keterbacaan 1,5 m belum | |
-| NFR: Instalasi | Satu Setup.exe, tanpa Python, ≤ 1,5 GB | 🔄 Sebagian | Build berjalan tanpa Python di PATH (328 MB). **Setup.exe belum dibuat: Inno Setup belum terpasang** |
+| NFR: Instalasi | Satu Setup.exe, tanpa Python, ≤ 1,5 GB | ✅ Lulus | `HarmoniSATB-Studio-1.1.0-Setup.exe` 87 MB (terpasang 328 MB); diinstal diam-diam di laptop ini, shortcut Desktop & Start Menu ada, aplikasi + `--uji-mandiri` lulus dengan PATH tanpa Python |
 | NFR: Offline | Semua fitur tanpa internet | ✅ Lulus (desain) | Tidak ada kode jaringan di aplikasi; uji dengan Wi-Fi mati = Uji 10 |
 
 **Masalah terbuka**
-- **Inno Setup 6 belum terpasang** di laptop ini, jadi Setup.exe belum bisa dibuat dan diuji. Tag `v1.1.0` ditunda sampai Setup.exe terpasang dan berjalan.
+- Inno Setup 6.7.3 menampilkan "Non-commercial use only": installer boleh dibuat gratis untuk pemakaian non-komersial (paduan suara). Bila kelak dijual, perlu lisensi komersial Inno Setup.
 - **Lisensi:** pedalboard (GPL v3) dan build FFmpeg (GPL v3) ikut dalam aplikasi. Jika installer dibagikan ke pihak lain, aplikasi secara keseluruhan perlu mengikuti ketentuan GPL v3 (kode sumber harus bisa diperoleh penerima). Keputusan ada di pemilik proyek.
 - Semua uji hardware SC202HD (kalibrasi, sinkron, stress, rekam suara asli, cabut USB) masih menunggu perangkat.
 
@@ -524,3 +524,9 @@ Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
 - SC202HD **tidak punya kenop** direct monitor; yang ada **tombol ON/OFF**. Aturan "suara penyanyi tidak diputar software" tetap berlaku. Atas persetujuan pengguna, semua teks "putar kenop direct monitor" diganti menjadi "nyalakan tombol direct monitor (ON)": layar Persiapan Rekam Vokal, langkah kalibrasi (OFF), skrip uji, PRD, CLAUDE.md, panduan pengguna.
 - **DeepFilterNet ditunda** sampai rekaman nyanyian asli dari SC202HD bisa didengar. Alasannya: dirancang untuk suara bicara (berisiko artefak pada vokal panjang), menambah ukuran installer, dan memperlambat proses.
 - SC202HD dijadwalkan disambungkan **07-11-2026**.
+
+**Installer (06-11-2026, setelah Inno Setup 6.7.3 dipasang pengguna)**
+- `tools/build_installer.py` → `installer\Output\HarmoniSATB-Studio-1.1.0-Setup.exe` (87 MB, kompilasi 256 s).
+- Diinstal `/VERYSILENT /CURRENTUSER` ke `%LOCALAPPDATA%\Programs\HarmoniSATB Studio\` + uninstaller; shortcut Desktop & Start Menu terbentuk.
+- Aplikasi terinstal, PATH tanpa Python: buka/tutup kode 0 (15 s); `--uji-mandiri` LULUS (−14,04 LUFS, 3 file valid).
+- Tag `v1.1.0`.
