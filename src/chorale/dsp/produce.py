@@ -111,24 +111,32 @@ def produce(project, progress: StepCallback | None = None, cancel=None, export: 
         result.wav_path = folder / f"{stem}_Master.wav"
         result.mp3_path = folder / f"{stem}_Master.mp3"
         result.report_path = folder / f"{stem}_Laporan.txt"
-        write_wav(result.wav_path, mastered.audio, production.samplerate)
-        if progress:
-            progress(7, 90)
-        check()
-        # MP3 (encoder FFmpeg satu inti) dan verifikasi FFmpeg berjalan bersamaan.
-        with ThreadPoolExecutor(max_workers=2) as pool:
-            mp3_job = pool.submit(encode_mp3, result.wav_path, result.mp3_path, project.title)
-            verify_job = pool.submit(ffmpeg_ebur128, result.wav_path) if verify else None
-            result.mp3 = mp3_job.result()
-            if verify_job is not None:
-                ours = Loudness(mastered.integrated_lufs, mastered.true_peak_dbtp, mastered.lra_lu)
-                result.verification = CrossCheck(ours, verify_job.result())
-        if result.mp3.trim_db < 0:
-            result.warnings.append(f"MP3 dikecilkan {-result.mp3.trim_db:.1f} dB agar puncaknya tetap ≤ -1,0 dBTP.")
-        if result.verification is not None and not result.verification.ok:
-            result.warnings.append("Pengukuran FFmpeg berbeda lebih dari 0,2 dari pengukuran aplikasi.")
-        result.seconds = time.perf_counter() - started
-        result.report_path.write_text(build_report(project, result, when), encoding="utf-8")
+        outputs = (result.wav_path, result.mp3_path, result.report_path)
+        try:
+            write_wav(result.wav_path, mastered.audio, production.samplerate)
+            if progress:
+                progress(7, 90)
+            check()
+            # MP3 (encoder FFmpeg satu inti) dan verifikasi FFmpeg berjalan bersamaan.
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                mp3_job = pool.submit(encode_mp3, result.wav_path, result.mp3_path, project.title, cancel=cancel)
+                verify_job = pool.submit(ffmpeg_ebur128, result.wav_path, cancel) if verify else None
+                result.mp3 = mp3_job.result()
+                if verify_job is not None:
+                    ours = Loudness(mastered.integrated_lufs, mastered.true_peak_dbtp, mastered.lra_lu)
+                    result.verification = CrossCheck(ours, verify_job.result())
+            check()
+            if result.mp3.trim_db < 0:
+                result.warnings.append(f"MP3 dikecilkan {-result.mp3.trim_db:.1f} dB agar puncaknya tetap ≤ -1,0 dBTP.")
+            if result.verification is not None and not result.verification.ok:
+                result.warnings.append("Pengukuran FFmpeg berbeda lebih dari 0,2 dari pengukuran aplikasi.")
+            result.seconds = time.perf_counter() - started
+            result.report_path.write_text(build_report(project, result, when), encoding="utf-8")
+        except BaseException:
+            # Nama dasar dijamin belum pernah dipakai, jadi file yang ada sekarang pasti buatan proses ini.
+            for path in outputs:
+                path.unlink(missing_ok=True)
+            raise
     result.seconds = time.perf_counter() - started
     if progress:
         progress(7, 100)

@@ -12,9 +12,9 @@ Rujukan: [PRD_v1.1.md](PRD_v1.1.md). Daftar segmen di bawah adalah rancangan awa
 | 5 | Mastering FR-7, pengukuran (LUFS/TP/LRA), ekspor & laporan FR-8, verifikasi ebur128 | 2 | ✅ Selesai (gerbang Sprint 2 lulus, dengan peredam derau dilewati) |
 | 6 | UI PySide6: kerangka, tema, daftar proyek, proyek baru, pengaturan + kalibrasi | 3 | ✅ Selesai |
 | 7 | UI: layar utama perekaman (5 track, transport, take, wizard vokal, error perangkat) | 3 | ✅ Kode, tes & screenshot selesai; uji manual SC202HD menunggu hardware |
-| 7b | UI: layar Proses Produksi & Hasil/A-B (sisa Sprint 3) | 3 | Belum |
-| 8 | Uji lapangan dengan paduan suara, perbaikan bug, uji penerimaan (Bagian 10) | 4 | Belum |
-| 9 | Paket PyInstaller + installer Inno Setup | 4 | Belum |
+| 8 | UI: Memproses Produksi, Hasil & Ekspor, alur penuh FR-5..FR-9 | 3 | ✅ Selesai (gerbang Sprint 3 lulus dengan audio simulasi/impor; uji SC202HD tertunda) |
+| 9 | Uji lapangan dengan paduan suara, perbaikan bug, uji penerimaan (Bagian 10) | 4 | Belum |
+| 10 | Paket PyInstaller + installer Inno Setup | 4 | Belum |
 
 ---
 
@@ -398,3 +398,70 @@ Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
 **Masalah terbuka**
 - Uji manual bersama pengguna (rekam piano + 1 suara sungguhan, ganti take, solo/mute, cabut USB saat merekam) menunggu SC202HD tersambung.
 - 2 commit sebelumnya (Segmen 5 & 6) belum ter-push karena github.com tidak bisa dihubungi dari laptop ini.
+
+---
+
+## Segmen 8 — Proses Produksi, Hasil & Ekspor, alur penuh (selesai; gerbang Sprint 3 lulus)
+
+**Yang dikerjakan**
+- `ui/processing.py`: dialog "Memproses Produksi".
+  - `produce()` berjalan di `QThread`; progres dikirim lewat sinyal antar-thread Qt.
+  - Progress bar + persen, "Sisa sekitar N detik" (dari kecepatan sejauh ini).
+  - Checklist 7 tahap: selesai (centang hijau), berjalan (pemintal biru), menunggu (lingkaran abu). "Membersihkan derau" tampil "dilewati" bila DeepFilterNet tidak terpasang.
+  - "Batalkan": proses benar-benar berhenti, termasuk FFmpeg yang sedang berjalan (`run_ffmpeg` mematikan prosesnya), dan file setengah jadi dihapus.
+  - Jika gagal: pesan error dan tombol "Tutup".
+- `ui/result_screen.py`: layar "Hasil Produksi".
+  - Lencana "Master selesai dibuat", waveform master (peak dari memori, bagian yang sudah diputar diarsir, klik untuk pindah posisi), tombol putar dan "Posisi Waktu 00:48.200 / 04:12.000".
+  - Sakelar "A · Mentah / B · Master" dengan kelantangan disamakan, dan teks "Volume A dan B disamakan agar perbandingan adil."
+  - Panel Laporan Mastering: Kelantangan, Puncak (True Peak), LRA, Durasi, Ruang. Centang hijau / peringatan kuning per target, lencana "Siap YouTube" atau "Perlu perhatian", serta catatan (mis. peredam derau dilewati).
+  - Panel Ekspor: 3 file (nama dipendekkan seperti mockup, path lengkap di tooltip) + "Buka Folder Hasil" (Windows Explorer dengan WAV terpilih).
+  - "Kembali & Ubah Pengaturan" kembali ke layar perekaman dengan pengaturan tetap; "Proses Ulang" menjalankan ulang `produce()` (file baru, file lama tidak ditimpa).
+- `audio/ab_player.py`: dua buffer (Mentah & Master, sudah diberi gain penyama kelantangan). Callback hanya menyalin dari buffer terpilih, jadi pindah A/B tidak memutus posisi.
+- `dsp/produce.py` & `dsp/export.py`: pembatalan selama ekspor, dan file buatan proses ini dihapus jika batal atau gagal. `dsp/errors.py` berisi `ProcessingCancelled` bersama.
+- `ui/main_window.py`: alur Layar Rekam → (lepas sound card) → Memproses Produksi → Hasil → Kembali / Proses Ulang. Batal/gagal kembali ke layar sebelumnya dengan pesan.
+- `tools/import_takes.py`: impor WAV/FLAC (atau `--contoh` SATB sintetis) sebagai take, diubah ke 48 kHz / 24-bit. Dipakai untuk menguji alur penuh tanpa merekam.
+- Perbaikan: Stop yang ditekan saat sesi masih disiapkan kini mengosongkan `record_track` (ditemukan saat membuat screenshot; ada tes regresi).
+- Perbaikan: "Rekaman … sampai detik N sudah tersimpan" kini dihitung setelah perekam selesai menulis sisa data ke disk. Sebelumnya angka bisa terlalu kecil saat CPU sibuk (ditemukan karena tes gagal saat CPU dibebani).
+
+- Perbaikan: proses Python bisa crash saat keluar (kode 139) setelah layar Pengaturan dibuat, karena widget tanpa induk (popup QComboBox) dihapus setelah QApplication hancur. Kini `python -m chorale` menghapus jendela utama secara eksplisit sebelum keluar, dan `tests/conftest.py` membersihkan semua widget di akhir sesi tes.
+
+**Hasil tes**: 235 tes lulus, proses keluar dengan kode 0.
+- `tests/test_flow.py` (non-UI):
+  - Proyek dengan 5 take hasil impor → `produce()` → tepat 3 file dengan nama sesuai aturan.
+  - WAV 48 kHz / 2 kanal / PCM_24, TP ≤ −1 dBTP, −14 ±1 LUFS. MP3 bisa didekode dan TP ≤ −1. Laporan lengkap. Verifikasi FFmpeg cocok.
+  - Batal setelah WAV tertulis → folder master kosong.
+  - FFmpeg berdurasi 30 detik berhenti < 5 detik setelah dibatalkan.
+  - Pemutar A/B mempertahankan posisi saat pindah sumber.
+  - Impor mengubah 44,1 kHz mono menjadi format track.
+- `tests/test_result_ui.py`:
+  - Dialog proses sampai selesai (ikon tahap, 100%).
+  - Batalkan → file dibersihkan; gagal → pesan + "Tutup".
+  - Layar hasil: semua teks mockup, A/B, Buka Folder, Proses Ulang, Kembali.
+  - **Alur penuh lewat jendela utama**: Proyek Baru → 5 take (impor) → Proses → Hasil "Siap YouTube" → Buka Folder (3 file) → Kembali dengan pengaturan tetap.
+  - Proses Ulang lalu dibatalkan → kembali ke Hasil, file lama tetap utuh.
+
+**Screenshot**: `docs/screenshots/14`–`17` (audio disimulasikan; proyek contoh sintetis).
+
+**Uji alur penuh dengan komponen sungguhan** (jendela utama asli, sound card Realtek sebagai pengganti SC202HD, Windows Explorer sungguhan; rekaman diganti impor take; tidak ada audio yang diputar):
+- Daftar Proyek → Proyek Baru "Haleluya Puji Tuhan" (96 BPM, 3/4) → layar rekam (pil "WASAPI Exclusive · 48 kHz · 24-bit") → 5 track diimpor → Proses Produksi & Master.
+- Hasil dalam 8,6 detik (lagu 40 detik): "Siap YouTube", −14,1 LUFS, −1,1 dBTP.
+- 3 file di folder master; "Buka Folder Hasil" membuka Explorer dengan WAV terpilih.
+- Kembali ke layar rekam dengan meter input aktif lagi.
+
+**Gerbang Sprint 3** — alur PRD bagian 3 lewat UI tanpa terminal: buat proyek → rekam 5 track → pilih take → Proses Produksi & Master → dengarkan A/B → ekspor/Buka Folder. Lulus dalam tes otomatis dengan stream simulasi dan take hasil impor. Langkah "rekam" sudah diuji dengan perangkat sungguhan di Realtek (Segmen 7); uji dengan SC202HD dan suara asli masih menunggu hardware.
+
+**Perbandingan dengan mockup**
+
+| Bagian | Perbedaan | Alasan |
+|---|---|---|
+| Lencana "Master selesai dibuat" | Satu baris | Mockup memotong menjadi dua baris |
+| Tombol bawah | "Kembali & Ubah Pengaturan" dan "Proses Ulang" satu baris | Mockup memotong teks |
+| Pil status | "WASAPI Exclusive · 48 kHz · 24-bit" satu baris | Mockup memecah teks per kata |
+| Tahap "Membersihkan derau" | Bisa tampil "dilewati" | DeepFilterNet belum dipakai (keputusan Segmen 4) |
+| Laporan | Ada catatan/peringatan di bawah baris | Agar alasan "Perlu perhatian" terlihat |
+| Waveform master | Dari audio asli (skala dB), bagian terputar diarsir | Mockup hanya ilustrasi |
+
+**Keputusan teknis**
+- Sound card dilepas oleh layar perekaman sebelum memproses, lalu dibuka lagi oleh pemutar A/B (output saja) dan kembali ke layar perekaman setelahnya.
+- Verifikasi FFmpeg selalu dijalankan dari UI (hasilnya masuk laporan), paralel dengan encode MP3.
+- Mentah untuk A/B = mixdown sebelum mastering (sama seperti Segmen 5); yang lebih keras dikecilkan.

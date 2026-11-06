@@ -11,8 +11,10 @@ from chorale.project import add_recent, open_project
 from chorale.project.store import default_projects_dir
 from chorale.settings import load_settings
 from chorale.ui.new_project import NewProjectOverlay
+from chorale.ui.processing import ProcessingOverlay
 from chorale.ui.project_list import ProjectListScreen
 from chorale.ui.recording_screen import RecordingScreen
+from chorale.ui.result_screen import ResultScreen
 from chorale.ui.settings_screen import SettingsScreen
 
 WINDOW_SIZE = (1440, 900)
@@ -31,13 +33,18 @@ class MainWindow(QMainWindow):
         self.projects = ProjectListScreen()
         self.settings_screen = SettingsScreen()
         self.recording = RecordingScreen()
-        for w in (self.projects, self.settings_screen, self.recording):
+        self.result_screen = ResultScreen()
+        for w in (self.projects, self.settings_screen, self.recording, self.result_screen):
             self.stack.addWidget(w)
         self.setCentralWidget(self.stack)
         self._previous: QWidget = self.projects
 
         self.new_project = NewProjectOverlay(self.projects_dir(), self.stack)
         self.new_project.created.connect(self.open_folder)
+        self.processing = ProcessingOverlay(self.stack)
+        self.processing.finished.connect(self._produced)
+        self.processing.cancelled.connect(self._produce_cancelled)
+        self.processing.closed.connect(self._produce_closed)
 
         self.projects.newProjectRequested.connect(self.show_new_project)
         self.projects.openFolderRequested.connect(self.choose_project_folder)
@@ -48,6 +55,8 @@ class MainWindow(QMainWindow):
         self.recording.backRequested.connect(self.show_projects)
         self.recording.settingsRequested.connect(self.show_settings)
         self.recording.produceRequested.connect(self._produce)
+        self.result_screen.backRequested.connect(self._back_to_recording)
+        self.result_screen.reprocessRequested.connect(self._produce)
 
     def projects_dir(self) -> Path:
         return Path(self.settings.projects_dir) if self.settings.projects_dir else default_projects_dir()
@@ -96,11 +105,44 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentWidget(self.recording)
         self.recording.show_project(project, self.settings)
 
+    # ----- proses produksi & hasil -----
     def _produce(self, project) -> None:
-        self.recording.toast.show_message("Layar Proses Produksi & Master dibuat di Segmen 8. Untuk sekarang "
-                                          "jalankan tools\\process_project.py.")
+        """Lepaskan sound card, lalu jalankan produce() di dialog Memproses Produksi."""
+        self.recording.suspend()
+        self.result_screen.shutdown()
+        self.processing.start(project)
+
+    def _produced(self, result) -> None:
+        self.result_screen.show_result(self.recording.project, result, self.settings)
+        self.stack.setCurrentWidget(self.result_screen)
+
+    def _resume_current(self, message: str | None = None) -> None:
+        current = self.stack.currentWidget()
+        if current is self.recording:
+            self.recording.resume(self.settings)
+            if message:
+                self.recording.toast.show_message(message)
+        elif current is self.result_screen:
+            self.result_screen.show_result(self.recording.project, self.result_screen.result, self.settings)
+            if message:
+                self.result_screen.toast.show_message(message)
+
+    def _produce_cancelled(self) -> None:
+        self._resume_current("Proses dibatalkan. Tidak ada file yang disimpan.")
+
+    def _produce_closed(self) -> None:
+        if not self.processing.running:
+            self._resume_current()
+
+    def _back_to_recording(self) -> None:
+        self.stack.setCurrentWidget(self.recording)
+        self.recording.resume(self.settings)
 
     def closeEvent(self, event):
+        if self.processing.running:
+            self.processing.cancel()
+            self.processing.worker.wait(30000)
+        self.result_screen.shutdown()
         self.recording.shutdown()
         self.settings_screen.shutdown()
         super().closeEvent(event)

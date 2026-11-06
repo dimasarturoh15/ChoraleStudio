@@ -178,15 +178,33 @@ def _no_window() -> int:
     return getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
-def ffmpeg_ebur128(path: Path) -> Loudness:
+def run_ffmpeg(args: list[str], cancel=None) -> tuple[int, bytes, bytes]:
+    """Jalankan FFmpeg; jika `cancel` (fungsi/Event) menjadi True, proses dihentikan dan
+    ProcessingCancelled dilempar. Mengembalikan (kode keluar, stdout, stderr)."""
+    from chorale.dsp.errors import ProcessingCancelled
+
+    is_cancelled = getattr(cancel, "is_set", cancel)
+    proc = subprocess.Popen([ffmpeg_exe(), *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            creationflags=_no_window())
+    while True:
+        try:
+            out, err = proc.communicate(timeout=0.1)
+            return proc.returncode, out, err
+        except subprocess.TimeoutExpired:
+            if is_cancelled is not None and is_cancelled():
+                proc.kill()
+                proc.communicate()
+                raise ProcessingCancelled("Pemrosesan dibatalkan.")
+
+
+def ffmpeg_ebur128(path: Path, cancel=None) -> Loudness:
     """Ukur file dengan filter ebur128 FFmpeg (peak=true)."""
-    cmd = [ffmpeg_exe(), "-hide_banner", "-nostats", "-i", str(path),
-           "-filter_complex", "ebur128=peak=true", "-f", "null", "-"]
-    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
-                          creationflags=_no_window())
-    summary = proc.stderr[proc.stderr.rfind("Summary:"):]
-    if proc.returncode != 0 or not summary:
-        raise RuntimeError(f"FFmpeg ebur128 gagal: {proc.stderr[-500:]}")
+    code, _, err_bytes = run_ffmpeg(["-hide_banner", "-nostats", "-i", str(path),
+                                     "-filter_complex", "ebur128=peak=true", "-f", "null", "-"], cancel)
+    stderr = err_bytes.decode("utf-8", errors="replace")
+    summary = stderr[stderr.rfind("Summary:"):]
+    if code != 0 or not summary:
+        raise RuntimeError(f"FFmpeg ebur128 gagal: {stderr[-500:]}")
 
     def grab(label: str) -> float:
         m = re.search(rf"{label}:\s+(-?inf|-?\d+(?:\.\d+)?)", summary)

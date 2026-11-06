@@ -315,3 +315,14 @@ def test_missing_device_shows_dialog(qapp, tmp_path):
     assert screen.error_overlay.isVisible()
     assert screen.error_overlay.title.text() == "Sound card tidak ditemukan"
     screen.shutdown()
+
+
+def test_stop_while_preparing_leaves_clean_state(qapp, tmp_path):
+    project = _project(tmp_path)
+    controller = controller_factory()(project, AppSettings())
+    controller.connect_device()
+    controller.record("piano")
+    controller.stop()  # biasanya masih tahap persiapan
+    assert wait_until(qapp, lambda: controller.poll().mode == IDLE and controller._pending is None)
+    assert controller.record_track is None and controller.session is None
+    controller.shutdown()

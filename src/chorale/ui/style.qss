@@ -268,3 +268,35 @@ QLabel[role="levelStatus"] {
 QLabel[role="levelStatus"][level="pas"] { color: @green; background: rgba(34, 197, 94, 0.12); border: 1px solid @green; }
 QLabel[role="levelStatus"][level="pelan"] { color: @yellow; background: rgba(234, 179, 8, 0.10); border: 1px solid @yellow; }
 QLabel[role="levelStatus"][level="keras"] { color: @red; background: rgba(239, 68, 68, 0.10); border: 1px solid @red; }
+
+/* ===== Proses produksi & hasil ===== */
+QProgressBar#produceBar { background: @raised; border: 1px solid @border; border-radius: 6px; }
+QProgressBar#produceBar::chunk { background: @blue; border-radius: 5px; }
+QLabel[role="percent"] { font-size: 20px; font-weight: 700; min-width: 56px; qproperty-alignment: AlignRight; }
+QLabel[role="stepLabel"] { font-size: 18px; color: @text; }
+QLabel[role="stepLabel"][state="menunggu"] { color: @text2; }
+QLabel[role="stepLabel"][state="dilewati"] { color: @text2; }
+QLabel[role="stepLabel"][state="berjalan"] { color: #FFFFFF; font-weight: 700; }
+
+QLabel[role="successBadge"] {
+    color: @green; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.6);
+    border-radius: 16px; padding: 6px 16px; font-size: 15px; font-weight: 500;
+}
+QLabel[role="readyBadge"] {
+    color: @yellow; background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.6);
+    border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 600;
+}
+QLabel[role="readyBadge"][ok="true"] { color: @green; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.6); }
+QLabel[role="countBadge"] {
+    color: @text2; background: @raised; border: 1px solid @border; border-radius: 6px;
+    padding: 4px 10px; font-size: 13px;
+}
+QLabel[role="reportValue"] { font-family: @font_mono; font-size: 16px; font-weight: 700; }
+QLabel[role="warningText"] { color: @yellow; font-size: 14px; }
+QFrame#fileRow { background: @raised; border: 1px solid @border; border-radius: 8px; }
+QLabel[role="fileName"] { font-family: @font_mono; font-size: 14px; }
+
+QPushButton[variant="bigPlay"] { background: @blue; border: none; border-radius: 32px; min-height: 0; padding: 0; }
+QPushButton[variant="bigPlay"]:hover { background: @blue_hover; }
+QLabel[role="bigClock"] { font-family: @font_mono; font-size: 36px; font-weight: 700; }
+QLabel[role="bigClockTotal"] { font-family: @font_mono; font-size: 26px; color: @text2; }

@@ -24,4 +24,10 @@ def main(argv: list[str] | None = None) -> int:
     auto_quit = os.environ.get("CHORALE_AUTOQUIT_MS")
     if auto_quit:
         QTimer.singleShot(int(auto_quit), window.close)
-    return app.exec()
+    code = app.exec()
+    # Hapus jendela selagi QApplication masih hidup; urutan penghapusan otomatis Python
+    # saat keluar tidak pasti dan bisa membuat Qt crash (mis. popup QComboBox).
+    import shiboken6
+
+    shiboken6.delete(window)
+    return code

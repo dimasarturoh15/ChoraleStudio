@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import math
 import re
-import subprocess
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -17,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from chorale.dsp.measure import _no_window, ffmpeg_exe, true_peak_db
+from chorale.dsp.measure import run_ffmpeg, true_peak_db
 
 SAMPLE_RATE = 48000
 TAIL_FLOOR_DB = -60.0
@@ -74,14 +73,13 @@ def write_wav(path: Path, audio: np.ndarray, samplerate: int = SAMPLE_RATE, seed
     sf.write(str(path), to_pcm24_tpdf(audio, seed), samplerate, subtype="PCM_24", format="WAV")
 
 
-def decode_audio(path: Path) -> np.ndarray:
+def decode_audio(path: Path, cancel=None) -> np.ndarray:
     """Dekode file apa pun lewat FFmpeg menjadi float32 stereo 48 kHz."""
-    cmd = [ffmpeg_exe(), "-hide_banner", "-loglevel", "error", "-i", str(path),
-           "-f", "f32le", "-ac", "2", "-ar", str(SAMPLE_RATE), "-"]
-    proc = subprocess.run(cmd, capture_output=True, creationflags=_no_window())
-    if proc.returncode != 0:
-        raise RuntimeError(f"FFmpeg gagal mendekode {path.name}: {proc.stderr.decode(errors='replace')[-300:]}")
-    return np.frombuffer(proc.stdout, dtype=np.float32).reshape(-1, 2)
+    code, out, err = run_ffmpeg(["-hide_banner", "-loglevel", "error", "-i", str(path),
+                                 "-f", "f32le", "-ac", "2", "-ar", str(SAMPLE_RATE), "-"], cancel)
+    if code != 0:
+        raise RuntimeError(f"FFmpeg gagal mendekode {path.name}: {err.decode(errors='replace')[-300:]}")
+    return np.frombuffer(out, dtype=np.float32).reshape(-1, 2)
 
 
 @dataclass(frozen=True)
@@ -90,22 +88,21 @@ class Mp3Info:
     trim_db: float
 
 
-def encode_mp3(wav: Path, mp3: Path, title: str, ceiling_dbtp: float = CEILING_DBTP) -> Mp3Info:
+def encode_mp3(wav: Path, mp3: Path, title: str, ceiling_dbtp: float = CEILING_DBTP, cancel=None) -> Mp3Info:
     """MP3 320 kbps CBR dengan tag judul. Jika encoder membuat puncak > ceiling, encode ulang sedikit lebih pelan."""
     if mp3.exists():
         raise FileExistsError(f"File sudah ada, tidak akan ditimpa: {mp3}")
     trim = 0.0
     for attempt in range(4):
-        cmd = [ffmpeg_exe(), "-hide_banner", "-loglevel", "error", "-y" if attempt else "-n",
-               "-i", str(wav)]
+        cmd = ["-hide_banner", "-loglevel", "error", "-y" if attempt else "-n", "-i", str(wav)]
         if trim < 0:
             cmd += ["-af", f"volume={trim:.2f}dB"]
         cmd += ["-c:a", "libmp3lame", "-b:a", MP3_BITRATE, "-ar", str(SAMPLE_RATE),
                 "-metadata", f"title={title}", "-id3v2_version", "3", str(mp3)]
-        proc = subprocess.run(cmd, capture_output=True, creationflags=_no_window())
-        if proc.returncode != 0:
-            raise RuntimeError(f"FFmpeg gagal membuat MP3: {proc.stderr.decode(errors='replace')[-300:]}")
-        tp = true_peak_db(decode_audio(mp3))
+        code, _, err = run_ffmpeg(cmd, cancel)
+        if code != 0:
+            raise RuntimeError(f"FFmpeg gagal membuat MP3: {err.decode(errors='replace')[-300:]}")
+        tp = true_peak_db(decode_audio(mp3, cancel))
         if tp <= ceiling_dbtp:
             return Mp3Info(tp, trim)
         trim -= (tp - ceiling_dbtp) + 0.1

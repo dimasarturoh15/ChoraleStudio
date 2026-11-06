@@ -222,11 +222,20 @@ def recording_shots(app, w, shot, projects_dir: Path) -> None:
     print(f"  {out.relative_to(ROOT)}")
     panel.close()
 
+    def wait_for(cond, timeout=60.0):
+        end = time.monotonic() + timeout
+        while time.monotonic() < end and not cond():
+            app.processEvents()
+            time.sleep(0.01)
+        if not cond():
+            raise RuntimeError("Kondisi tidak tercapai saat membuat screenshot")
+
+    ctrl = lambda: w.recording.controller  # noqa: E731
     w.recording.record("alto")
-    wait(app, 2600)
+    wait_for(lambda: ctrl().mode == "recording" and ctrl().session.song_seconds > -1.7)
     shot("10_merekam")
     w.recording.stop()
-    wait(app, 800)
+    wait_for(lambda: ctrl().mode == "idle")
 
     project = open_project(demo.folder)
     project.vocal_guide_done = False
@@ -246,7 +255,7 @@ def recording_shots(app, w, shot, projects_dir: Path) -> None:
     w.recording.project.vocal_guide_done = True
     die_after["n"] = 1250  # ±6,7 s: lewat hitungan awal 3,3 s, lalu "dicabut" saat merekam
     w.recording.record("alto")
-    wait(app, 9500)
+    wait_for(lambda: w.recording.error_overlay.isVisible() and ctrl().mode == "idle")
     shot("12_sound_card_terputus")
     w.recording.error_overlay.close_overlay()
     die_after["n"] = None
@@ -255,7 +264,93 @@ def recording_shots(app, w, shot, projects_dir: Path) -> None:
     w.resize(1280, 800)
     wait(app, 300)
     shot("13_layar_rekam_1280x800")
+    w.resize(1440, 900)
+    production_shots(app, w, shot, demo.folder, selection)
     w.recording.shutdown()
+
+
+def production_shots(app, w, shot, folder: Path, selection) -> None:
+    """Dialog Memproses Produksi (di tengah jalan) dan layar Hasil Produksi."""
+    from chorale.dsp.produce import produce
+    from chorale.project import open_project
+    from chorale.ui.result_screen import ResultScreen
+
+    # Isi kelima track dengan suara SATB sintetis (pengganti merekam; lihat tools/import_takes.py).
+    from tools.import_takes import import_demo
+
+    project = w.recording.project
+    import_demo(project, bars=24)
+    w.recording.refresh_tracks()
+    w.recording._update_pill()
+    wait(app, 300)
+
+    ResultScreen.selection_factory = staticmethod(lambda settings: selection)
+    ResultScreen.stream_factory = staticmethod(lambda sel, cb, bs: SimOutput(cb))
+    ResultScreen.open_folder = staticmethod(lambda path: print(f"  (Buka Folder Hasil -> {path.name})"))
+
+    def slow_produce(project, progress, cancel, verify):
+        def tick(step, pct):
+            progress(step, pct)
+            if 54 <= pct <= 60:
+                time.sleep(0.6)
+        return produce(project, progress=tick, cancel=cancel, verify=verify)
+
+    w.processing.produce_fn = slow_produce
+    if not w.recording.produce_btn.isEnabled():
+        raise RuntimeError("Tombol Proses Produksi & Master belum aktif")
+    w.recording.produce_btn.click()
+    end = time.monotonic() + 120
+    while time.monotonic() < end and w.processing.bar.value() < 540:
+        app.processEvents()
+        time.sleep(0.01)
+    shot("14_memproses_produksi")
+    end = time.monotonic() + 180
+    while time.monotonic() < end and w.stack.currentWidget() is not w.result_screen:
+        app.processEvents()
+        time.sleep(0.02)
+    if w.stack.currentWidget() is not w.result_screen:
+        raise RuntimeError(f"Layar hasil tidak muncul: {w.processing.error.text()!r}")
+    w.result_screen.player.seek(w.result_screen.player.length_seconds * 0.19)
+    wait(app, 200)
+    shot("15_hasil_produksi")
+    w.result_screen.toggle_play()
+    wait(app, 600)
+    w.result_screen.ab.button(0).click()
+    wait(app, 300)
+    shot("16_hasil_ab_mentah")
+    w.result_screen.toggle_play()
+    w.result_screen.open_btn.click()
+    w.resize(1280, 800)
+    wait(app, 300)
+    shot("17_hasil_produksi_1280x800")
+    w.result_screen.shutdown()
+
+
+class SimOutput:
+    """Output SIMULASI untuk pemutar A/B (tanpa suara keluar)."""
+
+    def __init__(self, callback):
+        import threading
+
+        self.callback, self._halt = callback, threading.Event()
+        self._thread = threading.Thread(target=self._run, daemon=True)
+
+    def _run(self):
+        import numpy as np
+
+        while not self._halt.is_set():
+            self.callback(np.empty((256, 2), np.float32), 256, None, None)
+            time.sleep(256 / 48000)
+
+    def start(self):
+        self._thread.start()
+
+    def stop(self):
+        self._halt.set()
+        self._thread.join(2)
+
+    def close(self):
+        pass
 
 
 if __name__ == "__main__":

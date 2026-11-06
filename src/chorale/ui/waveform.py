@@ -37,6 +37,17 @@ def compute_peaks(path: Path) -> np.ndarray:
     return np.concatenate(out) if out else np.zeros(0, dtype=np.float32)
 
 
+def peaks_from_array(audio: np.ndarray) -> np.ndarray:
+    """Seperti compute_peaks, tetapi dari audio di memori (mis. master hasil produce)."""
+    mono = np.abs(audio).max(axis=1) if audio.ndim == 2 else np.abs(audio)
+    n = len(mono) // SAMPLES_PER_PEAK
+    peaks = mono[:n * SAMPLES_PER_PEAK].reshape(n, SAMPLES_PER_PEAK).max(axis=1)
+    rest = mono[n * SAMPLES_PER_PEAK:]
+    if len(rest):
+        peaks = np.append(peaks, rest.max())
+    return peaks.astype(np.float32)
+
+
 def peak_at(peaks: np.ndarray | None, seconds: float, window: float = 1 / 30) -> float:
     """Puncak linear di jendela [seconds - window, seconds] (untuk meter saat memutar)."""
     if peaks is None or seconds < 0:
@@ -111,8 +122,12 @@ def _display_level(peaks: np.ndarray) -> np.ndarray:
 class WaveformView(QWidget):
     """Gambar waveform satu track + playhead. Kolom piksel dihitung ulang hanya bila data/ukuran berubah."""
 
+    seekRequested = Signal(float)
+
     def __init__(self, color: str, parent=None):
         super().__init__(parent)
+        self.shade_played = False   # arsir bagian yang sudah diputar (layar Hasil)
+        self.seekable = False       # klik untuk pindah posisi
         self.color = QColor(color)
         self.setMinimumHeight(80)
         self._peaks: np.ndarray | None = None
@@ -168,6 +183,13 @@ class WaveformView(QWidget):
         if seconds != self._playhead:
             self._playhead = seconds
             self.update()
+
+    def mousePressEvent(self, event):
+        if self.seekable and self.has_audio():
+            inner_left, inner_width = 12.5, self.width() - 25.0
+            frac = (event.position().x() - inner_left) / max(1.0, inner_width)
+            self.seekRequested.emit(max(0.0, min(1.0, frac)) * self._view_seconds)
+        super().mousePressEvent(event)
 
     def has_audio(self) -> bool:
         return (self._peaks is not None and len(self._peaks) > 0) or self._live is not None
@@ -225,6 +247,10 @@ class WaveformView(QWidget):
                 p.drawLine(QPointF(x0 + x, mid - h), QPointF(x0 + x, mid + h))
         if self._playhead is not None and self._playhead >= 0:
             x = x0 + min(1.0, self._playhead / self._view_seconds) * inner.width()
+            if self.shade_played:
+                shade = QColor(COLORS["blue"])
+                shade.setAlphaF(0.12)
+                p.fillRect(QRectF(inner.left(), r.top() + 1, x - inner.left(), r.height() - 2), shade)
             p.setPen(QPen(self._playhead_color, 2))
             p.drawLine(QPointF(x, r.top() + 2), QPointF(x, r.bottom() - 2))
         p.end()

@@ -237,6 +237,7 @@ class AudioController:
             future, self._pending = self._pending, None
             if self._pending_mode == IDLE or future.cancelled():
                 self.mode = IDLE
+                self.record_track = None  # Stop ditekan saat sesi masih disiapkan
                 self.start_monitor()
             else:
                 try:
@@ -253,8 +254,9 @@ class AudioController:
         # Sound card hilang?
         if self.session is not None and self.session.device_lost:
             track = self.record_track
-            saved = self.session.recorder.frames_written / 48000 if self.session.recorder else 0.0
             take = self.session.stop()
+            # Diukur setelah perekam selesai menulis sisa data ke disk (bukan saat terdeteksi).
+            saved = take.duration if take is not None else 0.0
             label = self.project.track(track).label if track else None
             loss = DeviceLoss(self.card_name, label, saved, take)  # nama diambil sebelum selection dikosongkan
             self.selection = None

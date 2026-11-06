@@ -26,6 +26,13 @@ _PATHS = {
     "metronome": '<path d="M7 21L10 3h4l3 18z"/><path d="M12 16l5-9"/>',
     "sparkles": '<path d="M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z"/>'
                 '<path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8z"/>',
+    "bars": '<path d="M5 20v-6M10 20V9M15 20v-9M20 20V5M3 20h18"/>',
+    "upload": '<path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/>',
+    "file": '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+    "sliders": '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+    "refresh": '<path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4"/>',
+    "info": '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+    "minus": '<path d="M7 12h10"/>',
     "dot": '<circle cx="12" cy="12" r="7" fill="{c}" stroke="none"/>',
     "warning": '<path d="M12 3L2 20h20z"/><path d="M12 10v4M12 17v.5"/>',
 }

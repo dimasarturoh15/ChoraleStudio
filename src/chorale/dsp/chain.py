@@ -61,8 +61,7 @@ COMP_DETECTOR_BLOCK = 48  # 1 ms
 ProgressCallback = Callable[[int, float], None]
 
 
-class ProcessingCancelled(Exception):
-    """Pemrosesan dibatalkan pengguna."""
+from chorale.dsp.errors import ProcessingCancelled  # noqa: E402  (diekspor ulang untuk kompatibilitas)
 
 
 # ----- tahap 2-4 -----
