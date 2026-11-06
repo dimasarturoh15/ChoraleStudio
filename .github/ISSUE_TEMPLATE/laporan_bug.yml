@@ -1,0 +1,51 @@
+name: Laporan bug
+description: Aplikasi tidak bekerja seperti seharusnya.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih sudah melapor. Lampirkan log dari `%APPDATA%\HarmoniSATB\logs\harmonisatb.log`
+        (tombol **Buka Folder Log** ada di Pengaturan > Tentang Aplikasi).
+  - type: input
+    id: versi
+    attributes:
+      label: Versi aplikasi
+      description: Pengaturan > Tentang Aplikasi
+      placeholder: "1.1.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Versi Windows
+      placeholder: "Windows 11 23H2"
+    validations:
+      required: true
+  - type: input
+    id: perangkat
+    attributes:
+      label: Sound card dan mode driver
+      description: Teks di bagian atas layar rekam
+      placeholder: "SPL Audio SC202HD · WASAPI Exclusive · 48 kHz · 24-bit · 12 ms"
+  - type: textarea
+    id: langkah
+    attributes:
+      label: Langkah untuk memunculkan masalah
+      placeholder: |
+        1. Buka proyek ...
+        2. Tekan Rekam pada track Alto ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: harapan
+    attributes:
+      label: Yang diharapkan dan yang terjadi
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Potongan log
+      render: text

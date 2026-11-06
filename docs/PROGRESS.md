@@ -530,3 +530,13 @@ Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
 - Diinstal `/VERYSILENT /CURRENTUSER` ke `%LOCALAPPDATA%\Programs\HarmoniSATB Studio\` + uninstaller; shortcut Desktop & Start Menu terbentuk.
 - Aplikasi terinstal, PATH tanpa Python: buka/tutup kode 0 (15 s); `--uji-mandiri` LULUS (−14,04 LUFS, 3 file valid).
 - Tag `v1.1.0`.
+
+---
+
+## Dokumentasi repositori (07-11-2026)
+
+- README ditulis ulang untuk repositori publik: badge, daftar isi, fitur, galeri tangkapan layar, cara kerja, kebutuhan sistem, instalasi, mulai cepat, pengembangan, ringkasan kriteria penerimaan, batasan, hak cipta.
+- Dokumen baru: `docs/ARCHITECTURE.md` (model thread, engine real-time, DSP, mastering, format proyek, data aplikasi, keputusan desain), `docs/CLI.md` (referensi semua alat), `CONTRIBUTING.md`, `CHANGELOG.md` (Keep a Changelog), `SECURITY.md`, `THIRD_PARTY_NOTICES.md`, templat Issue (laporan bug, usulan) dan pull request.
+- **Diperbaiki:** `installer/harmonisatb.spec` ternyata tidak pernah masuk repositori karena aturan `*.spec` di `.gitignore`; kini dikecualikan sehingga installer bisa dibuat dari hasil clone.
+- Keputusan pengguna: repositori publik **tanpa lisensi open-source** (hak cipta dilindungi). Lisensi pihak ketiga (GPL v3 untuk pedalboard dan FFmpeg) dijelaskan di THIRD_PARTY_NOTICES.md.
+- Semua tautan relatif dan anchor di dokumen baru dicek otomatis: 0 rusak.

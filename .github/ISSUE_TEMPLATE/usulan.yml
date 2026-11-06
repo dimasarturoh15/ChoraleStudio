@@ -1,0 +1,26 @@
+name: Usulan
+description: Usulan perbaikan atau fitur untuk versi berikutnya.
+labels: [usulan]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cakupan versi 1.1 ditetapkan oleh [PRD](https://github.com/dimasarturoh15/ChoraleStudio/blob/main/docs/PRD_v1.1.md).
+        Usulan fitur baru dicatat sebagai bahan PRD versi berikutnya.
+  - type: textarea
+    id: masalah
+    attributes:
+      label: Masalah yang ingin diselesaikan
+      description: Ceritakan situasi saat merekam atau memproses yang membuat ini dibutuhkan.
+    validations:
+      required: true
+  - type: textarea
+    id: usulan
+    attributes:
+      label: Usulan
+    validations:
+      required: true
+  - type: textarea
+    id: alternatif
+    attributes:
+      label: Alternatif yang sudah dicoba

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Panduan pengguna
+    url: https://github.com/dimasarturoh15/ChoraleStudio/blob/main/docs/PANDUAN_PENGGUNA.md
+    about: Cara memakai aplikasi dari instalasi sampai ekspor, beserta pemecahan masalah umum.
+  - name: Laporan keamanan
+    url: https://github.com/dimasarturoh15/ChoraleStudio/security/advisories/new
+    about: Laporkan kerentanan secara pribadi, bukan lewat Issue publik.
