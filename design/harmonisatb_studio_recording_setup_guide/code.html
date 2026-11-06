@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440, height=900, initial-scale=1.0">
+  <title>HarmoniSATB Studio - Recording Setup Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      background-color: #0E1116;
+      color: #E6EDF3;
+      margin: 0;
+      padding: 0;
+      width: 1440px;
+      height: 900px;
+      overflow: hidden;
+      position: relative;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="relative flex flex-col justify-between w-[1440px] h-[900px] overflow-hidden bg-[#0E1116] text-[#E6EDF3]">
+
+  <!-- BACKGROUND: Main Recording Screen (Dimmed by overlay) -->
+  <div class="absolute inset-0 w-full h-full flex flex-col justify-between pointer-events-none select-none z-0">
+    <!-- Top Bar -->
+    <header class="h-14 border-b border-[#2A3340] px-6 flex items-center justify-between bg-[#161B22]/80">
+      <div class="flex items-center gap-4">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#1F2630] border border-[#2A3340] text-[#8B98A5]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+        </div>
+        <h1 class="text-lg font-semibold tracking-tight text-[#E6EDF3]">Bapa Engkau Sungguh Baik</h1>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F2630] border border-[#2A3340] text-xs font-mono text-[#8B98A5]">
+          <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+          <span>WASAPI Exclusive</span>
+          <span>•</span>
+          <span>48 kHz</span>
+          <span>•</span>
+          <span>24-bit</span>
+          <span>•</span>
+          <span>12 ms</span>
+        </div>
+
+        <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#2A3340] hover:bg-[#1F2630] text-[#8B98A5] text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span>Pengaturan</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Transport Bar -->
+    <div class="h-20 bg-[#161B22]/90 border-b border-[#2A3340] px-6 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <div class="w-10 h-10 rounded-lg bg-[#1F2630] border border-[#2A3340] flex items-center justify-center text-[#8B98A5]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+            </svg>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-[#3B82F6] flex items-center justify-center text-white">
+            <svg class="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-[#1F2630] border border-[#2A3340] flex items-center justify-center text-[#8B98A5]">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <rect x="6" y="6" width="12" height="12" rx="1"></rect>
+            </svg>
+          </div>
+        </div>
+        <div class="px-5 py-2 rounded-lg bg-[#0E1116] border border-[#2A3340] font-mono text-2xl tracking-wider text-[#E6EDF3]">
+          00:00.000
+        </div>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-3">
+          <div class="px-3 py-1.5 rounded-lg bg-[#1F2630] border border-[#2A3340] text-center">
+            <div class="text-[11px] text-[#8B98A5] uppercase tracking-wider">Tempo</div>
+            <div class="text-sm font-semibold font-mono">72 BPM</div>
+          </div>
+          <div class="px-3 py-1.5 rounded-lg bg-[#1F2630] border border-[#2A3340] text-center">
+            <div class="text-[11px] text-[#8B98A5] uppercase tracking-wider">Birama</div>
+            <div class="text-sm font-semibold font-mono">4/4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracks Area (5 Tracks) -->
+    <div class="flex-1 px-6 py-4 space-y-3 overflow-hidden">
+      <!-- Piano/Orgen -->
+      <div class="h-[84px] bg-[#161B22] border border-[#2A3340] rounded-lg p-3 flex items-center gap-4">
+        <div class="w-1 self-stretch rounded-full bg-[#14B8A6]"></div>
+        <div class="w-40 font-semibold text-sm">Piano/Orgen</div>
+        <div class="w-14 h-14 rounded-full bg-[#22C55E] flex items-center justify-center text-white">✓</div>
+        <div class="flex-1 h-12 bg-[#0E1116] rounded border border-[#2A3340]"></div>
+      </div>
+      <!-- Bass -->
+      <div class="h-[84px] bg-[#161B22] border border-[#2A3340] rounded-lg p-3 flex items-center gap-4">
+        <div class="w-1 self-stretch rounded-full bg-[#8B5CF6]"></div>
+        <div class="w-40 font-semibold text-sm">Bass</div>
+        <div class="w-14 h-14 rounded-full bg-[#22C55E] flex items-center justify-center text-white">✓</div>
+        <div class="flex-1 h-12 bg-[#0E1116] rounded border border-[#2A3340]"></div>
+      </div>
+      <!-- Tenor -->
+      <div class="h-[84px] bg-[#161B22] border border-[#2A3340] rounded-lg p-3 flex items-center gap-4">
+        <div class="w-1 self-stretch rounded-full bg-[#3B82F6]"></div>
+        <div class="w-40 font-semibold text-sm">Tenor</div>
+        <div class="w-14 h-14 rounded-full bg-[#22C55E] flex items-center justify-center text-white">✓</div>
+        <div class="flex-1 h-12 bg-[#0E1116] rounded border border-[#2A3340]"></div>
+      </div>
+      <!-- Alto -->
+      <div class="h-[84px] bg-[#161B22] border border-[#2A3340] rounded-lg p-3 flex items-center gap-4">
+        <div class="w-1 self-stretch rounded-full bg-[#F59E0B]"></div>
+        <div class="w-40 font-semibold text-sm">Alto</div>
+        <div class="w-14 h-14 rounded-full bg-[#4B5563] flex items-center justify-center text-white">
+          <span class="w-3.5 h-3.5 rounded-full bg-white"></span>
+        </div>
+        <div class="flex-1 h-12 bg-[#0E1116] rounded border border-[#2A3340] flex items-center justify-center text-xs text-[#8B98A5]">Belum direkam</div>
+      </div>
+      <!-- Sopran -->
+      <div class="h-[84px] bg-[#161B22] border border-[#2A3340] rounded-lg p-3 flex items-center gap-4">
+        <div class="w-1 self-stretch rounded-full bg-[#EF4444]"></div>
+        <div class="w-40 font-semibold text-sm">Sopran</div>
+        <div class="w-14 h-14 rounded-full bg-[#4B5563] flex items-center justify-center text-white">
+          <span class="w-3.5 h-3.5 rounded-full bg-white"></span>
+        </div>
+        <div class="flex-1 h-12 bg-[#0E1116] rounded border border-[#2A3340] flex items-center justify-center text-xs text-[#8B98A5]">Belum direkam</div>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="h-16 bg-[#161B22] border-t border-[#2A3340] px-6 flex items-center justify-between">
+      <div class="text-xs text-[#8B98A5]">Ruang: Katedral · Normal</div>
+      <div class="px-6 py-2.5 rounded-xl bg-[#1F2630] border border-[#2A3340] text-sm text-[#8B98A5]">Proses Produksi & Master</div>
+    </div>
+  </div>
+
+  <!-- 70% BLACK OVERLAY -->
+  <div class="absolute inset-0 bg-black/70 z-10 flex items-center justify-center backdrop-blur-[1px]">
+
+    <!-- DIALOG WIZARD: width 880px, height 640px, surface #161B22, radius 12px, border #2A3340, padding 32px -->
+    <div class="relative w-[880px] h-[640px] bg-[#161B22] border border-[#2A3340] rounded-xl p-8 flex flex-col justify-between shadow-2xl z-20">
+
+      <!-- 1. HEADER & STEPPER -->
+      <div class="space-y-6">
+        <!-- Title & Close Button -->
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-bold tracking-tight text-[#E6EDF3]">Persiapan Rekam Vokal</h2>
+          <button class="w-9 h-9 rounded-lg flex items-center justify-center text-[#8B98A5] hover:text-[#E6EDF3] hover:bg-[#1F2630] transition-colors border border-transparent hover:border-[#2A3340]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Horizontal Stepper (3 Steps connected by line) -->
+        <div class="relative flex items-center justify-between px-6 pt-1 pb-3">
+          <!-- Background Connecting Lines -->
+          <div class="absolute top-[19px] left-[52px] right-[52px] h-[2px] bg-[#2A3340] -z-0">
+            <!-- Active Progress line up to Step 2 -->
+            <div class="h-full bg-[#3B82F6] w-1/2"></div>
+          </div>
+
+          <!-- Step 1: Completed -->
+          <div class="relative z-10 flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full bg-[#22C55E] flex items-center justify-center text-white shadow-sm ring-4 ring-[#161B22]">
+              <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <span class="mt-2 text-sm font-medium text-[#8B98A5]">1 Posisi Penyanyi</span>
+          </div>
+
+          <!-- Step 2: Active -->
+          <div class="relative z-10 flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full bg-[#3B82F6] flex items-center justify-center text-white shadow-sm ring-4 ring-[#161B22]">
+              <span class="text-sm font-bold font-mono">2</span>
+            </div>
+            <span class="mt-2 text-sm font-semibold text-[#E6EDF3]">2 Atur Gain Mic</span>
+          </div>
+
+          <!-- Step 3: Pending -->
+          <div class="relative z-10 flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full bg-[#161B22] border-2 border-[#4B5563] flex items-center justify-center text-[#8B98A5] ring-4 ring-[#161B22]">
+              <span class="text-sm font-medium font-mono text-[#8B98A5]">3</span>
+            </div>
+            <span class="mt-2 text-sm font-medium text-[#8B98A5]">3 Atur Headphone</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider line -->
+      <div class="h-px bg-[#2A3340] w-full -my-1"></div>
+
+      <!-- 2. CONTENT — STEP 2 "Atur Gain Mic" (Two Columns: 55% / 45%) -->
+      <div class="flex-1 flex gap-8 items-center py-4">
+
+        <!-- LEFT COLUMN (55%): Numbered Instructions -->
+        <div class="w-[55%] flex flex-col justify-center space-y-4">
+          <div class="text-xs uppercase tracking-wider text-[#8B98A5] font-semibold mb-1">Panduan Langkah</div>
+          
+          <div class="space-y-3.5">
+            <!-- Item 1 -->
+            <div class="flex items-start gap-3.5 p-3 rounded-lg bg-[#1F2630]/60 border border-[#2A3340]/60">
+              <span class="w-6 h-6 rounded-md bg-[#1F2630] border border-[#2A3340] flex items-center justify-center text-xs font-mono font-semibold text-[#3B82F6] shrink-0 mt-0.5">1</span>
+              <p class="text-base text-[#E6EDF3] leading-snug">Nyalakan tombol +48V pada sound card.</p>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="flex items-start gap-3.5 p-3 rounded-lg bg-[#1F2630]/60 border border-[#2A3340]/60">
+              <span class="w-6 h-6 rounded-md bg-[#1F2630] border border-[#2A3340] flex items-center justify-center text-xs font-mono font-semibold text-[#3B82F6] shrink-0 mt-0.5">2</span>
+              <p class="text-base text-[#E6EDF3] leading-snug">Minta kelompok menyanyikan bagian paling keras dari lagu.</p>
+            </div>
+
+            <!-- Item 3 (Highlight) -->
+            <div class="flex items-start gap-3.5 p-3 rounded-lg bg-[#1F2630] border border-[#3B82F6]/50">
+              <span class="w-6 h-6 rounded-md bg-[#3B82F6] flex items-center justify-center text-xs font-mono font-bold text-white shrink-0 mt-0.5">3</span>
+              <p class="text-base text-[#E6EDF3] font-medium leading-snug">Putar kenop Gain sampai meter berada di area target.</p>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="flex items-start gap-3.5 p-3 rounded-lg bg-[#1F2630]/60 border border-[#2A3340]/60">
+              <span class="w-6 h-6 rounded-md bg-[#1F2630] border border-[#2A3340] flex items-center justify-center text-xs font-mono font-semibold text-[#3B82F6] shrink-0 mt-0.5">4</span>
+              <p class="text-base text-[#E6EDF3] leading-snug">Jangan ubah Gain selama merekam suara ini.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN (45%): Live Meter & Target Zone -->
+        <div class="w-[45%] h-full flex flex-col justify-center space-y-6 pl-2">
+          <div class="p-6 rounded-xl bg-[#1F2630] border border-[#2A3340] space-y-5">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold text-[#E6EDF3]">Pemantauan Level Mic</span>
+              <span class="text-xs font-mono text-[#8B98A5]">Input 1 · Mono</span>
+            </div>
+
+            <!-- Visual Meter Scale & Bars -->
+            <div class="space-y-1.5">
+              <!-- Meter Scale Marks -->
+              <div class="flex justify-between text-[11px] font-mono text-[#8B98A5] px-1">
+                <span>-42</span>
+                <span>-24</span>
+                <span class="text-[#3B82F6] font-semibold">-14</span>
+                <span class="text-[#3B82F6] font-semibold">-10</span>
+                <span>-3</span>
+                <span class="text-[#EF4444]">0 dB</span>
+              </div>
+
+              <!-- Large Horizontal Level Meter (Height 48px, target zone highlighted) -->
+              <div class="relative w-full h-12 bg-[#0E1116] rounded-lg border border-[#2A3340] p-1.5 flex items-center overflow-hidden">
+                
+                <!-- Underlay Grid / Meter Segments Background -->
+                <div class="absolute inset-x-1.5 inset-y-1.5 flex gap-1 z-0 opacity-20">
+                  <div class="h-full flex-[6] bg-[#22C55E] rounded-sm"></div>
+                  <div class="h-full flex-[3] bg-[#EAB308] rounded-sm"></div>
+                  <div class="h-full flex-[1] bg-[#EF4444] rounded-sm"></div>
+                </div>
+
+                <!-- Live Active Meter Bar (filling up to -11.8 dBFS, around 72% width) -->
+                <div class="relative z-10 h-full w-[72%] flex gap-1 rounded-sm overflow-hidden">
+                  <!-- Green Section (-42 to -12 dBFS) -->
+                  <div class="h-full w-[70%] bg-[#22C55E] rounded-l-sm"></div>
+                  <!-- Yellow Section entered slightly (-12 to -11.8 dBFS) -->
+                  <div class="h-full w-[30%] bg-[#EAB308]"></div>
+                </div>
+
+                <!-- Target Zone Overlay (-14 to -10 dBFS): outlined in blue with label -->
+                <div class="absolute z-20 top-0 bottom-0 left-[62%] w-[18%] border-2 border-[#3B82F6] bg-[#3B82F6]/15 rounded flex items-center justify-center pointer-events-none">
+                  <div class="absolute -top-0.5 bg-[#3B82F6] text-white text-[9px] font-bold px-1 rounded-b tracking-tight">
+                    Area Target
+                  </div>
+                </div>
+
+                <!-- Clip indicator square at the far right -->
+                <div class="absolute right-1.5 top-1.5 bottom-1.5 w-2.5 rounded-sm bg-[#EF4444]/20 border border-[#2A3340]"></div>
+              </div>
+
+              <!-- Meter Legend / Sub-labels -->
+              <div class="flex justify-between items-center text-[11px] text-[#8B98A5] px-1 pt-0.5">
+                <span>Aman</span>
+                <span class="text-[#3B82F6] font-medium">Optimal (-14 s/d -10 dBFS)</span>
+                <span>Klip</span>
+              </div>
+            </div>
+
+            <!-- Readout & Status Row -->
+            <div class="flex items-center justify-between pt-2 border-t border-[#2A3340]">
+              <div class="space-y-0.5">
+                <div class="text-[12px] text-[#8B98A5]">Pembacaan Puncak</div>
+                <div class="text-lg font-bold font-mono text-[#E6EDF3]">Puncak: -11.8 dBFS</div>
+              </div>
+
+              <!-- Green status chip: "Level sudah pas" -->
+              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#22C55E]/15 border border-[#22C55E]/40 text-[#22C55E] text-sm font-semibold">
+                <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Level sudah pas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. FOOTER: Kembali (Left) & Lanjut (Right) -->
+      <div class="pt-4 border-t border-[#2A3340] flex items-center justify-between">
+        <button class="px-6 py-3 rounded-xl border border-[#2A3340] bg-transparent hover:bg-[#1F2630] text-[#E6EDF3] text-base font-semibold transition-colors">
+          Kembali
+        </button>
+
+        <button class="px-8 py-3 rounded-xl bg-[#3B82F6] hover:bg-blue-600 text-white text-base font-semibold shadow-md transition-colors flex items-center gap-2">
+          <span>Lanjut</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

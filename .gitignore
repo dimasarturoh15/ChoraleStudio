@@ -1,0 +1,25 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Build
+build/
+dist/
+*.spec
+
+# Rekaman & hasil audio (besar)
+*.wav
+*.mp3
+*.flac
+projects/
+recordings/
+
+# Model AI
+*.pt
+*.onnx
+
+# Sistem
+.vscode/settings.json
+Thumbs.db
+.DS_Store

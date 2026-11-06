@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=1440, height=900, initial-scale=1.0" name="viewport"/>
+<title>HarmoniSATB Studio - Recording State</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      width: 1440px;
+      height: 900px;
+      overflow: hidden;
+      background-color: #0E1116;
+      color: #E6EDF3;
+      font-family: 'Inter', sans-serif;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Waveform visual styling */
+    .waveform-bar {
+      border-radius: 2px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="flex flex-col h-[900px] w-[1440px] bg-[#0E1116] text-[#E6EDF3] border border-[#2A3340] select-none">
+<!-- ZONE A: TOP BAR (Height 56px) -->
+<header class="h-[56px] min-h-[56px] bg-[#161B22] border-b border-[#2A3340] px-6 flex items-center justify-between z-10">
+<!-- Left: Back button & Project Title -->
+<div class="flex items-center gap-4">
+<button class="w-9 h-9 rounded-lg bg-[#1F2630] border border-[#2A3340] flex items-center justify-center text-[#8B98A5] hover:text-[#E6EDF3] hover:bg-[#2A3340] transition-colors" title="Kembali">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20">
+<line x1="19" x2="5" y1="12" y2="12"></line>
+<polyline points="12 19 5 12 12 5"></polyline>
+</svg>
+</button>
+<div class="flex items-center gap-3">
+<span class="text-[20px] font-semibold tracking-tight text-[#E6EDF3]">Bapa Engkau Sungguh Baik</span>
+</div>
+</div>
+<!-- Center: Audio Engine Status Pill -->
+<div class="bg-[#1F2630] border border-[#2A3340] rounded-full px-4 py-1.5 flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#22C55E] animate-pulse"></span>
+<span class="mono text-[13px] text-[#E6EDF3] font-medium tracking-wide">WASAPI Exclusive · 48 kHz · 24-bit · 12 ms</span>
+</div>
+<!-- Right: Settings Button -->
+<div class="flex items-center">
+<button class="h-9 px-3.5 rounded-lg bg-[#1F2630] border border-[#2A3340] flex items-center gap-2 text-[#8B98A5] hover:text-[#E6EDF3] hover:bg-[#2A3340] transition-colors text-[14px] font-medium">
+<svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18">
+<circle cx="12" cy="12" r="3"></circle>
+<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+</svg>
+<span>Pengaturan</span>
+</button>
+</div>
+</header>
+<!-- ZONE B: TRANSPORT BAR (Height 80px) -->
+<section class="h-[80px] min-h-[80px] bg-[#161B22] border-b border-[#2A3340] px-6 flex items-center justify-between z-10">
+<!-- Left Group: Transport Buttons & Timecode -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<!-- Ke Awal -->
+<button class="w-12 h-12 rounded-full bg-[#1F2630] border border-[#2A3340] flex items-center justify-center text-[#8B98A5] hover:text-[#E6EDF3] hover:bg-[#2A3340] transition-colors" title="Ke Awal">
+<svg fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="22">
+<polygon points="19 20 9 12 19 4 19 20"></polygon>
+<line x1="5" x2="5" y1="19" y2="5"></line>
+</svg>
+</button>
+<!-- Putar -->
+<button class="w-12 h-12 rounded-full bg-[#3B82F6] flex items-center justify-center text-white hover:bg-blue-600 transition-colors shadow-sm" title="Putar">
+<svg fill="currentColor" height="24" viewbox="0 0 24 24" width="24">
+<polygon points="6 4 20 12 6 20 6 4"></polygon>
+</svg>
+</button>
+<!-- Stop -->
+<button class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#0E1116] hover:bg-gray-100 transition-colors shadow-md" title="Stop"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><rect height="16" rx="2" width="16" x="4" y="4"></rect></svg></button>
+</div>
+<!-- Time Display Box -->
+<div class="bg-[#1F2630] border border-[#2A3340] rounded-lg px-5 py-2 flex items-center justify-center">
+<span class="mono text-[32px] font-bold text-[#EF4444] tracking-wider leading-none">01:24.360</span>
+</div>
+</div>
+<!-- Center Group: 3 Read-only Info Boxes -->
+<div class="flex items-center gap-3">
+<!-- Tempo -->
+<div class="bg-[#1F2630] border border-[#2A3340] rounded-lg px-4 py-2 w-[100px] flex flex-col items-center justify-center">
+<span class="text-[13px] text-[#8B98A5] font-medium leading-tight">Tempo</span>
+<span class="mono text-[16px] font-bold text-[#E6EDF3] leading-tight mt-0.5">72 BPM</span>
+</div>
+<!-- Birama -->
+<div class="bg-[#1F2630] border border-[#2A3340] rounded-lg px-4 py-2 w-[90px] flex flex-col items-center justify-center">
+<span class="text-[13px] text-[#8B98A5] font-medium leading-tight">Birama</span>
+<span class="mono text-[16px] font-bold text-[#E6EDF3] leading-tight mt-0.5">4/4</span>
+</div>
+<!-- Hitungan Awal -->
+<div class="bg-[#1F2630] border border-[#2A3340] rounded-lg px-4 py-2 w-[116px] flex flex-col items-center justify-center">
+<span class="text-[13px] text-[#8B98A5] font-medium leading-tight">Hitungan Awal</span>
+<span class="mono text-[16px] font-bold text-[#E6EDF3] leading-tight mt-0.5">2 Bar</span>
+</div>
+</div>
+<!-- Right Group: Metronome & Volume -->
+<div class="flex items-center gap-5">
+<!-- Metronome Toggle (ON State) -->
+<button class="h-11 px-4 rounded-lg bg-[#1F2630] border-2 border-[#3B82F6] flex items-center gap-2.5 text-[#3B82F6] font-semibold text-[14px]">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20">
+<path d="M12 2v20"></path>
+<path d="m18 19-6-15-6 15"></path>
+<path d="m8 15 8-4"></path>
+</svg>
+<span>Metronom</span>
+</button>
+<!-- Metronome Volume Slider -->
+<div class="flex flex-col gap-1 w-[140px]">
+<div class="flex justify-between items-center text-[13px] leading-none">
+<span class="text-[#8B98A5]">Volume Metronom</span>
+<span class="mono text-[#E6EDF3] font-medium">80%</span>
+</div>
+<div class="h-2 bg-[#0E1116] rounded-full relative overflow-hidden border border-[#2A3340]">
+<div class="h-full bg-[#3B82F6] rounded-full w-[80%]"></div>
+</div>
+</div>
+</div>
+</section><div class="h-[40px] min-h-[40px] bg-[#EF4444]/15 border-l-4 border-[#EF4444] border-b border-[#2A3340] px-6 flex items-center justify-between z-10"><div class="flex items-center gap-2.5"><span class="w-2.5 h-2.5 rounded-full bg-[#EF4444] animate-pulse"></span><span class="text-[14px] font-bold text-[#EF4444] tracking-wide uppercase">Merekam — Alto</span></div><span class="text-[13px] text-[#E6EDF3] font-medium">Tekan Stop untuk selesai</span></div>
+<!-- ZONE C: TRACK AREA (5 Tracks, approx 112px each) -->
+<main class="flex-1 px-6 py-3 flex flex-col gap-2 overflow-hidden justify-between">
+<!-- TRACK 1: Piano/Orgen -->
+<div class="h-[110px] bg-[#161B22] border border-[#2A3340] rounded-lg relative flex overflow-hidden"><div class="w-1 bg-[#14B8A6] h-full flex-shrink-0"></div><div class="w-[420px] p-3 flex items-center justify-between border-r border-[#2A3340] flex-shrink-0"><div class="w-[104px] flex flex-col"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[#14B8A6] flex-shrink-0"></span><span class="text-[17px] font-semibold text-[#E6EDF3] truncate leading-tight">Piano/Orgen</span></div><span class="text-[13px] text-[#8B98A5] mt-1 truncate">Input 1–2 · Stereo</span></div><div class="flex items-center justify-center flex-shrink-0 mx-1 opacity-50 cursor-not-allowed"><div class="w-[72px] h-[72px] rounded-full bg-[#22C55E] flex items-center justify-center shadow-lg"><svg fill="none" height="34" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewbox="0 0 24 24" width="34"><polyline points="20 6 9 17 4 12"></polyline></svg></div></div><div class="flex flex-col gap-1.5 flex-shrink-0"><button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">S</button><button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">M</button></div><div class="flex flex-col gap-2 w-[150px] flex-shrink-0 pl-1"><div><div class="flex justify-between items-center text-[13px] mb-1"><span class="text-[#8B98A5]">Volume</span><span class="mono text-[#E6EDF3] text-[13px] font-medium">0.0 dB</span></div><div class="h-2 bg-[#0E1116] rounded-full relative overflow-hidden border border-[#2A3340]"><div class="h-full bg-[#8B98A5] rounded-full w-[66%]"></div></div></div><div class="h-[34px] bg-[#1F2630] border border-[#2A3340] rounded px-2.5 flex items-center justify-between text-[13px] cursor-pointer hover:border-gray-500"><span class="mono text-[#E6EDF3] truncate">Take 1 · 12:48</span><svg fill="none" height="14" stroke="#8B98A5" stroke-width="2.5" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg></div></div></div><div class="flex-1 bg-[#0E1116] mx-3 my-2.5 rounded border border-[#2A3340] p-2 flex items-center relative overflow-hidden"><svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 600 70"><path d="M 0,35 Q 20,10 40,35 T 80,35 T 120,5 T 160,35 T 200,15 T 240,35 T 280,2 T 320,35 T 360,18 T 400,35 T 440,8 T 480,35 T 520,20 T 560,35 T 600,35" fill="none" opacity="0.9" stroke="#14B8A6" stroke-width="2.5"></path><path d="M 0,35 Q 20,22 40,35 T 80,35 T 120,28 T 160,35 T 200,25 T 240,35 T 280,32 T 320,35 T 360,26 T 400,35 T 440,29 T 480,35 T 520,24 T 560,35 T 600,35" fill="none" opacity="0.5" stroke="#14B8A6" stroke-width="1.5"></path><line stroke="#2A3340" stroke-dasharray="3 3" stroke-width="1" x1="0" x2="600" y1="35" y2="35"></line><line stroke="#FFFFFF" stroke-width="2" x1="210" x2="210" y1="0" y2="70"></line></svg><div class="absolute top-0 bottom-0 left-[35%] w-[2px] bg-white shadow-sm pointer-events-none"></div></div><div class="w-[32px] p-2 flex-shrink-0 flex flex-col items-center justify-between border-l border-[#2A3340] bg-[#161B22]"><div class="w-3.5 h-2 bg-[#2A3340] rounded-[1px] mb-1"></div><div class="flex-1 w-3.5 bg-[#0E1116] rounded-[2px] p-[1px] flex flex-col justify-end gap-[1px] border border-[#2A3340]"><div class="h-[12%] bg-[#2A3340] rounded-[1px]"></div><div class="h-[25%] bg-[#EAB308] rounded-[1px]"></div><div class="h-[50%] bg-[#22C55E] rounded-[1px]"></div></div><span class="mono text-[10px] text-[#8B98A5] mt-1 font-semibold leading-none">-14</span></div></div>
+<!-- TRACK 2: Bass -->
+<div class="h-[110px] bg-[#161B22] border border-[#2A3340] rounded-lg relative flex overflow-hidden"><div class="w-1 bg-[#8B5CF6] h-full flex-shrink-0"></div><div class="w-[420px] p-3 flex items-center justify-between border-r border-[#2A3340] flex-shrink-0"><div class="w-[104px] flex flex-col"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[#8B5CF6] flex-shrink-0"></span><span class="text-[17px] font-semibold text-[#E6EDF3] truncate leading-tight">Bass</span></div><span class="text-[13px] text-[#8B98A5] mt-1 truncate">Input 1 · Mic</span></div><div class="flex items-center justify-center flex-shrink-0 mx-1 opacity-50 cursor-not-allowed"><div class="w-[72px] h-[72px] rounded-full bg-[#22C55E] flex items-center justify-center shadow-lg"><svg fill="none" height="34" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewbox="0 0 24 24" width="34"><polyline points="20 6 9 17 4 12"></polyline></svg></div></div><div class="flex flex-col gap-1.5 flex-shrink-0"><button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">S</button><button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">M</button></div><div class="flex flex-col gap-2 w-[150px] flex-shrink-0 pl-1"><div><div class="flex justify-between items-center text-[13px] mb-1"><span class="text-[#8B98A5]">Volume</span><span class="mono text-[#E6EDF3] text-[13px] font-medium">0.0 dB</span></div><div class="h-2 bg-[#0E1116] rounded-full relative overflow-hidden border border-[#2A3340]"><div class="h-full bg-[#8B98A5] rounded-full w-[66%]"></div></div></div><div class="h-[34px] bg-[#1F2630] border border-[#2A3340] rounded px-2.5 flex items-center justify-between text-[13px] cursor-pointer hover:border-gray-500"><span class="mono text-[#E6EDF3] truncate">Take 2 · 13:01</span><svg fill="none" height="14" stroke="#8B98A5" stroke-width="2.5" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg></div></div></div><div class="flex-1 bg-[#0E1116] mx-3 my-2.5 rounded border border-[#2A3340] p-2 flex items-center relative overflow-hidden"><svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 600 70"><path d="M 0,35 Q 30,12 60,35 T 120,35 T 180,4 T 240,35 T 300,10 T 360,35 T 420,8 T 480,35 T 540,16 T 600,35" fill="none" opacity="0.9" stroke="#8B5CF6" stroke-width="2.5"></path><line stroke="#2A3340" stroke-dasharray="3 3" stroke-width="1" x1="0" x2="600" y1="35" y2="35"></line></svg><div class="absolute top-0 bottom-0 left-[35%] w-[2px] bg-white shadow-sm pointer-events-none"></div></div><div class="w-[32px] p-2 flex-shrink-0 flex flex-col items-center justify-between border-l border-[#2A3340] bg-[#161B22]"><div class="w-3.5 h-2 bg-[#2A3340] rounded-[1px] mb-1"></div><div class="flex-1 w-3.5 bg-[#0E1116] rounded-[2px] p-[1px] flex flex-col justify-end gap-[1px] border border-[#2A3340]"><div class="h-[12%] bg-[#2A3340] rounded-[1px]"></div><div class="h-[25%] bg-[#2A3340] rounded-[1px]"></div><div class="h-[44%] bg-[#22C55E] rounded-[1px]"></div></div><span class="mono text-[10px] text-[#8B98A5] mt-1 font-semibold leading-none">-18</span></div></div>
+<!-- TRACK 3: Tenor -->
+<div class="h-[110px] bg-[#161B22] border border-[#2A3340] rounded-lg relative flex overflow-hidden"><div class="w-1 bg-[#3B82F6] h-full flex-shrink-0"></div><div class="w-[420px] p-3 flex items-center justify-between border-r border-[#2A3340] flex-shrink-0"><div class="w-[104px] flex flex-col"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[#3B82F6] flex-shrink-0"></span><span class="text-[17px] font-semibold text-[#E6EDF3] truncate leading-tight">Tenor</span></div><span class="text-[13px] text-[#8B98A5] mt-1 truncate">Input 1 · Mic</span></div><div class="flex items-center justify-center flex-shrink-0 mx-1 opacity-50 cursor-not-allowed"><div class="w-[72px] h-[72px] rounded-full bg-[#22C55E] flex items-center justify-center shadow-lg"><svg fill="none" height="34" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" viewbox="0 0 24 24" width="34"><polyline points="20 6 9 17 4 12"></polyline></svg></div></div><div class="flex flex-col gap-1.5 flex-shrink-0"><button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">S</button><button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">M</button></div><div class="flex flex-col gap-2 w-[150px] flex-shrink-0 pl-1"><div><div class="flex justify-between items-center text-[13px] mb-1"><span class="text-[#8B98A5]">Volume</span><span class="mono text-[#E6EDF3] text-[13px] font-medium">0.0 dB</span></div><div class="h-2 bg-[#0E1116] rounded-full relative overflow-hidden border border-[#2A3340]"><div class="h-full bg-[#8B98A5] rounded-full w-[66%]"></div></div></div><div class="h-[34px] bg-[#1F2630] border border-[#2A3340] rounded px-2.5 flex items-center justify-between text-[13px] cursor-pointer hover:border-gray-500"><span class="mono text-[#E6EDF3] truncate">Take 1 · 13:10</span><svg fill="none" height="14" stroke="#8B98A5" stroke-width="2.5" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg></div></div></div><div class="flex-1 bg-[#0E1116] mx-3 my-2.5 rounded border border-[#2A3340] p-2 flex items-center relative overflow-hidden"><svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 600 70"><path d="M 0,35 Q 25,18 50,35 T 100,35 T 150,7 T 200,35 T 250,15 T 300,35 T 350,10 T 400,35 T 450,22 T 500,35 T 550,14 T 600,35" fill="none" opacity="0.9" stroke="#3B82F6" stroke-width="2.5"></path><line stroke="#2A3340" stroke-dasharray="3 3" stroke-width="1" x1="0" x2="600" y1="35" y2="35"></line></svg><div class="absolute top-0 bottom-0 left-[35%] w-[2px] bg-white shadow-sm pointer-events-none"></div></div><div class="w-[32px] p-2 flex-shrink-0 flex flex-col items-center justify-between border-l border-[#2A3340] bg-[#161B22]"><div class="w-3.5 h-2 bg-[#2A3340] rounded-[1px] mb-1"></div><div class="flex-1 w-3.5 bg-[#0E1116] rounded-[2px] p-[1px] flex flex-col justify-end gap-[1px] border border-[#2A3340]"><div class="h-[12%] bg-[#2A3340] rounded-[1px]"></div><div class="h-[25%] bg-[#2A3340] rounded-[1px]"></div><div class="h-[52%] bg-[#22C55E] rounded-[1px]"></div></div><span class="mono text-[10px] text-[#8B98A5] mt-1 font-semibold leading-none">-16</span></div></div>
+<!-- TRACK 4: Alto -->
+<div class="h-[110px] bg-[#161B22] border-2 border-[#EF4444] shadow-[0_0_15px_rgba(239,68,68,0.25)] rounded-lg relative flex overflow-hidden"><div class="w-1 bg-[#EF4444] h-full flex-shrink-0"></div><div class="w-[420px] p-3 flex items-center justify-between border-r border-[#2A3340] flex-shrink-0"><div class="w-[104px] flex flex-col"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[#F59E0B] flex-shrink-0"></span><span class="text-[17px] font-semibold text-[#E6EDF3] truncate leading-tight">Alto</span></div><span class="text-[13px] text-[#8B98A5] mt-1 truncate">Input 1 · Mic</span></div><div class="flex items-center justify-center flex-shrink-0 mx-1"><div class="w-[72px] h-[72px] rounded-full bg-[#EF4444] shadow-[0_0_0_6px_rgba(239,68,68,0.35)] flex items-center justify-center cursor-pointer transition-transform animate-pulse"><div class="w-5 h-5 rounded-full bg-white shadow-sm"></div></div></div><div class="flex flex-col gap-1.5 flex-shrink-0"><button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">S</button><button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">M</button></div><div class="flex flex-col gap-2 w-[150px] flex-shrink-0 pl-1"><div><div class="flex justify-between items-center text-[13px] mb-1"><span class="text-[#8B98A5]">Volume</span><span class="mono text-[#E6EDF3] text-[13px] font-medium">0.0 dB</span></div><div class="h-2 bg-[#0E1116] rounded-full relative overflow-hidden border border-[#2A3340]"><div class="h-full bg-[#8B98A5] rounded-full w-[66%]"></div></div></div><div class="h-[34px] bg-[#1F2630] border border-[#EF4444]/60 rounded px-2.5 flex items-center justify-between text-[13px] cursor-pointer"><span class="mono text-[#EF4444] font-medium truncate">Take 1 (Merekam...)</span><svg fill="none" height="14" stroke="#EF4444" stroke-width="2.5" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg></div></div></div><div class="flex-1 bg-[#0E1116] mx-3 my-2.5 rounded border border-[#2A3340] p-2 flex items-center relative overflow-hidden"><svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 600 70"><path d="M 0,35 Q 15,15 30,35 T 60,35 T 90,8 T 120,35 T 150,18 T 180,35 T 210,12" fill="none" opacity="0.95" stroke="#EF4444" stroke-width="2.5"></path><line stroke="#2A3340" stroke-dasharray="3 3" stroke-width="1" x1="0" x2="600" y1="35" y2="35"></line></svg><div class="absolute top-0 bottom-0 left-[35%] w-[2px] bg-[#EF4444] shadow-[0_0_8px_#EF4444] pointer-events-none"></div></div><div class="w-[32px] p-2 flex-shrink-0 flex flex-col items-center justify-between border-l border-[#2A3340] bg-[#161B22]"><div class="w-3.5 h-2 bg-[#2A3340] rounded-[1px] mb-1"></div><div class="flex-1 w-3.5 bg-[#0E1116] rounded-[2px] p-[1px] flex flex-col justify-end gap-[1px] border border-[#2A3340]"><div class="h-[12%] bg-[#2A3340] rounded-[1px]"></div><div class="h-[25%] bg-[#EAB308] rounded-[1px]"></div><div class="h-[60%] bg-[#22C55E] rounded-[1px]"></div></div><span class="mono text-[10px] text-[#EAB308] mt-1 font-semibold leading-none">-6</span></div></div>
+<!-- TRACK 5: Sopran -->
+<div class="h-[110px] bg-[#161B22] border border-[#2A3340] rounded-lg relative flex overflow-hidden opacity-50" style="opacity: 0.4; pointer-events: none;">
+<!-- Track Left Color Bar -->
+<div class="w-1 bg-[#EF4444] h-full flex-shrink-0"></div>
+<!-- Column 1: Controls (420px) -->
+<div class="w-[420px] p-3 flex items-center justify-between border-r border-[#2A3340] flex-shrink-0">
+<!-- Name & Input -->
+<div class="w-[104px] flex flex-col">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#EF4444] flex-shrink-0"></span>
+<span class="text-[17px] font-semibold text-[#E6EDF3] truncate leading-tight">Sopran</span>
+</div>
+<span class="text-[13px] text-[#8B98A5] mt-1 truncate">Input 1 · Mic</span>
+</div>
+<!-- Record Button: EMPTY (72x72) -->
+<div class="flex items-center justify-center flex-shrink-0 mx-1">
+<div class="w-[72px] h-[72px] rounded-full bg-[#4B5563] flex items-center justify-center cursor-pointer hover:bg-gray-500 transition-colors">
+<div class="w-4 h-4 rounded-full bg-white"></div>
+</div>
+</div>
+<!-- Solo / Mute Stack -->
+<div class="flex flex-col gap-1.5 flex-shrink-0">
+<button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">S</button>
+<button class="w-[38px] h-[36px] rounded bg-[#1F2630] border border-[#2A3340] text-[#8B98A5] font-bold text-[14px] hover:text-[#E6EDF3]">M</button>
+</div>
+<!-- Volume & Take -->
+<div class="flex flex-col gap-2 w-[150px] flex-shrink-0 pl-1">
+<div>
+<div class="flex justify-between items-center text-[13px] mb-1">
+<span class="text-[#8B98A5]">Volume</span>
+<span class="mono text-[#E6EDF3] text-[13px] font-medium">0.0 dB</span>
+</div>
+<!-- Slider Track -->
+<div class="h-2 bg-[#0E1116] rounded-full relative overflow-hidden border border-[#2A3340]">
+<div class="h-full bg-[#8B98A5] rounded-full w-[66%]"></div>
+</div>
+</div>
+<!-- Take Dropdown (Disabled) -->
+<div class="h-[34px] bg-[#1F2630] border border-[#2A3340] rounded px-2.5 flex items-center justify-between text-[13px] opacity-50 cursor-not-allowed">
+<span class="mono text-[#8B98A5]">—</span>
+<svg fill="none" height="14" stroke="#8B98A5" stroke-width="2.5" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+</div>
+<!-- Column 2: Waveform Empty -->
+<div class="flex-1 bg-[#0E1116] mx-3 my-2.5 rounded border border-[#2A3340] flex items-center justify-center">
+<span class="text-[15px] font-medium text-[#8B98A5] tracking-wide">Belum direkam</span>
+</div>
+<!-- Column 3: Meter (32px) -->
+<div class="w-[32px] p-2 flex-shrink-0 flex flex-col items-center justify-between border-l border-[#2A3340] bg-[#161B22]">
+<div class="w-3.5 h-2 bg-[#2A3340] rounded-[1px] mb-1"></div>
+<div class="flex-1 w-3.5 bg-[#0E1116] rounded-[2px] p-[1px] flex flex-col justify-end gap-[1px] border border-[#2A3340]">
+<div class="h-[12%] bg-[#2A3340] rounded-[1px]"></div>
+<div class="h-[25%] bg-[#2A3340] rounded-[1px]"></div>
+<div class="h-[10%] bg-[#2A3340] rounded-[1px]"></div>
+</div>
+<span class="mono text-[10px] text-[#8B98A5] mt-1 font-semibold leading-none">-inf</span>
+</div>
+</div>
+</main>
+<!-- ZONE D: PRODUCTION BAR (Height 104px) -->
+<footer class="h-[104px] min-h-[104px] bg-[#161B22] border-t border-[#2A3340] px-6 flex items-center justify-between z-10" style="opacity: 0.4; pointer-events: none;">
+<!-- Left Groups: Segmented Controls -->
+<div class="flex items-center gap-8">
+<!-- Control 1: Ruang -->
+<div class="flex flex-col gap-1.5">
+<span class="text-[14px] text-[#8B98A5] font-medium leading-none">Ruang</span>
+<div class="bg-[#1F2630] border border-[#2A3340] rounded-lg p-1 flex items-center gap-1">
+<button class="px-4 py-2 rounded-md text-[14px] font-medium text-[#8B98A5] hover:text-[#E6EDF3] transition-colors">Gereja Kecil</button>
+<button class="px-4 py-2 rounded-md text-[14px] font-medium text-[#8B98A5] hover:text-[#E6EDF3] transition-colors">Aula</button>
+<button class="px-4 py-2 rounded-md text-[14px] font-semibold text-white bg-[#3B82F6] shadow-sm">Katedral</button>
+</div>
+</div>
+<!-- Control 2: Jumlah Reverb -->
+<div class="flex flex-col gap-1.5">
+<span class="text-[14px] text-[#8B98A5] font-medium leading-none">Jumlah Reverb</span>
+<div class="bg-[#1F2630] border border-[#2A3340] rounded-lg p-1 flex items-center gap-1">
+<button class="px-4 py-2 rounded-md text-[14px] font-medium text-[#8B98A5] hover:text-[#E6EDF3] transition-colors">Sedikit</button>
+<button class="px-4 py-2 rounded-md text-[14px] font-semibold text-white bg-[#3B82F6] shadow-sm">Normal</button>
+<button class="px-4 py-2 rounded-md text-[14px] font-medium text-[#8B98A5] hover:text-[#E6EDF3] transition-colors">Banyak</button>
+</div>
+</div>
+</div>
+<!-- Right: Big Action Button (Disabled State) -->
+<div class="flex flex-col items-end gap-1.5">
+<button class="w-[360px] h-[64px] rounded-xl bg-[#1F2630] border border-[#2A3340] flex items-center justify-center gap-3 text-[#8B98A5] cursor-not-allowed" disabled="">
+<svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24">
+<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+<path d="M5 3v4"></path>
+<path d="M19 17v4"></path>
+<path d="M3 5h4"></path>
+<path d="M17 19h4"></path>
+</svg>
+<span class="text-[17px] font-semibold tracking-wide">Proses Produksi &amp; Master</span>
+</button>
+<span class="text-[13px] text-[#8B98A5] font-medium pr-1">Rekam kelima track terlebih dahulu</span>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,999 @@
+<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440, height=900">
+  <title>HarmoniSATB Studio - Device Error</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      width: 1440px;
+      height: 900px;
+      overflow: hidden;
+      background-color: #0E1116;
+      color: #E6EDF3;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      position: relative;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      height: 56px;
+      background-color: #161B22;
+      border-bottom: 1px solid #2A3340;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background-color: #1F2630;
+      border: 1px solid #2A3340;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8B98A5;
+      cursor: pointer;
+    }
+
+    .project-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #E6EDF3;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-pill {
+      background-color: #1F2630;
+      border: 1px solid #2A3340;
+      border-radius: 20px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #8B98A5;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #22C55E;
+    }
+
+    .settings-btn {
+      background-color: #1F2630;
+      border: 1px solid #2A3340;
+      border-radius: 8px;
+      height: 36px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #8B98A5;
+      cursor: pointer;
+    }
+
+    /* TRANSPORT BAR */
+    .transport-bar {
+      height: 72px;
+      background-color: #0E1116;
+      border-bottom: 1px solid #2A3340;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .transport-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .transport-btn {
+      background-color: #1F2630;
+      border: 1px solid #2A3340;
+      color: #8B98A5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .btn-return {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+    }
+
+    .btn-play {
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+      background-color: #3B82F6;
+      border: none;
+      color: #FFFFFF;
+    }
+
+    .btn-stop {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+    }
+
+    .timecode-display {
+      background-color: #161B22;
+      border: 1px solid #2A3340;
+      border-radius: 8px;
+      height: 48px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      font-size: 26px;
+      font-weight: 600;
+      color: #E6EDF3;
+      letter-spacing: 1px;
+    }
+
+    .transport-center {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .meta-box {
+      background-color: #161B22;
+      border: 1px solid #2A3340;
+      border-radius: 8px;
+      height: 48px;
+      padding: 4px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #8B98A5;
+      letter-spacing: 0.5px;
+    }
+
+    .meta-val {
+      font-size: 15px;
+      font-weight: 600;
+      color: #E6EDF3;
+    }
+
+    .transport-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .metronome-btn {
+      background-color: #1F2630;
+      border: 1px solid #3B82F6;
+      border-radius: 8px;
+      height: 40px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #3B82F6;
+      cursor: pointer;
+    }
+
+    .metronome-vol {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 110px;
+    }
+
+    .vol-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #8B98A5;
+    }
+
+    .vol-slider-track {
+      height: 4px;
+      background-color: #1F2630;
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .vol-slider-fill {
+      width: 80%;
+      height: 100%;
+      background-color: #3B82F6;
+      border-radius: 2px;
+    }
+
+    /* TRACKS CONTAINER */
+    .tracks-list {
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 648px;
+    }
+
+    .track-card {
+      background-color: #161B22;
+      border: 1px solid #2A3340;
+      border-radius: 8px;
+      height: 104px;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .track-strip {
+      width: 4px;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .track-controls {
+      width: 280px;
+      padding: 12px 16px 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-right: 1px solid #2A3340;
+      flex-shrink: 0;
+    }
+
+    .record-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: none;
+    }
+
+    .record-btn.recorded {
+      background-color: #22C55E;
+      color: #FFFFFF;
+    }
+
+    .record-btn.empty {
+      background-color: #4B5563;
+    }
+
+    .record-btn.empty .inner-dot {
+      width: 24px;
+      height: 24px;
+      background-color: #FFFFFF;
+      border-radius: 50%;
+    }
+
+    .track-info-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-grow: 1;
+    }
+
+    .track-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .track-name-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .track-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #E6EDF3;
+    }
+
+    .track-input-label {
+      font-size: 13px;
+      color: #8B98A5;
+    }
+
+    .track-settings-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .btn-solo-mute {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background-color: #1F2630;
+      border: 1px solid #2A3340;
+      color: #8B98A5;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vol-fader-small {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-grow: 1;
+    }
+
+    .vol-fader-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #8B98A5;
+    }
+
+    .vol-track-line {
+      height: 3px;
+      background-color: #2A3340;
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .vol-track-thumb {
+      width: 6px;
+      height: 10px;
+      background-color: #8B98A5;
+      border-radius: 1px;
+      position: absolute;
+      top: -3.5px;
+      left: 65%;
+    }
+
+    .take-dropdown {
+      height: 24px;
+      background-color: #1F2630;
+      border: 1px solid #2A3340;
+      border-radius: 4px;
+      padding: 0 6px;
+      font-size: 11px;
+      color: #E6EDF3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 105px;
+    }
+
+    /* WAVEFORM & METERS */
+    .track-display {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      position: relative;
+    }
+
+    .waveform-area {
+      flex-grow: 1;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .waveform-svg {
+      width: 100%;
+      height: 72px;
+    }
+
+    .empty-track-msg {
+      color: #8B98A5;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .meter-vertical {
+      width: 14px;
+      height: 80px;
+      background-color: #1F2630;
+      border: 1px solid #2A3340;
+      border-radius: 3px;
+      margin-left: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1px;
+      position: relative;
+    }
+
+    .meter-fill {
+      width: 100%;
+      border-radius: 2px;
+    }
+
+    .meter-db-label {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: #8B98A5;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* BOTTOM PRODUCTION BAR */
+    .production-bar {
+      height: 68px;
+      background-color: #0E1116;
+      border-top: 1px solid #2A3340;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .reverb-controls {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .reverb-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .group-label {
+      font-size: 12px;
+      color: #8B98A5;
+    }
+
+    .segmented-control {
+      display: flex;
+      background-color: #161B22;
+      border: 1px solid #2A3340;
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .seg-item {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #8B98A5;
+      cursor: pointer;
+    }
+
+    .seg-item.active {
+      background-color: #3B82F6;
+      color: #FFFFFF;
+      font-weight: 500;
+    }
+
+    .master-btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .btn-master {
+      height: 48px;
+      padding: 0 24px;
+      border-radius: 12px;
+      background-color: #1F2630;
+      color: #4B5563;
+      border: 1px solid #2A3340;
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: not-allowed;
+    }
+
+    .master-hint {
+      font-size: 12px;
+      color: #8B98A5;
+    }
+
+    /* MODAL OVERLAY & ERROR DIALOG */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1440px;
+      height: 900px;
+      background-color: rgba(0, 0, 0, 0.60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .error-dialog {
+      width: 520px;
+      background-color: #161B22;
+      border-radius: 12px;
+      padding: 32px;
+      border: 1px solid #2A3340;
+      border-top: 4px solid #EF4444;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .dialog-header {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .warning-icon-wrapper {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #EF4444;
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dialog-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #E6EDF3;
+      line-height: 1.2;
+    }
+
+    .dialog-body {
+      font-size: 16px;
+      color: #E6EDF3;
+      line-height: 1.5;
+    }
+
+    .dialog-secondary {
+      font-size: 14px;
+      color: #8B98A5;
+      line-height: 1.4;
+    }
+
+    .dialog-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn-outline {
+      height: 44px;
+      padding: 0 20px;
+      border-radius: 8px;
+      background-color: transparent;
+      border: 1px solid #2A3340;
+      color: #E6EDF3;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      height: 44px;
+      padding: 0 24px;
+      border-radius: 8px;
+      background-color: #3B82F6;
+      border: none;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BACKGROUND: MAIN RECORDING SCREEN (IDLE STATE) -->
+  <div class="top-bar" style="padding-right: 32px; padding-left: 24px;">
+    <div class="top-left">
+      <div class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </div>
+      <div class="project-title">Bapa Engkau Sungguh Baik</div>
+    </div>
+    <div class="top-right">
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span class="">WASAPI Exclusive • 48 kHz • 24-bit • 12 ms</span>
+      </div>
+      <div class="settings-btn" style="white-space: nowrap; flex-shrink: 0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span class="">Pengaturan</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="transport-bar">
+    <div class="transport-left">
+      <button class="transport-btn btn-return">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="19 20 9 12 19 4 19 20"></polygon>
+          <line x1="5" y1="19" x2="5" y2="5"></line>
+        </svg>
+      </button>
+      <button class="transport-btn btn-play">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+      </button>
+      <button class="transport-btn btn-stop">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="5" y="5" width="14" height="14" rx="2"></rect>
+        </svg>
+      </button>
+      <div class="timecode-display font-mono">00:00.000</div>
+    </div>
+
+    <div class="transport-center">
+      <div class="meta-box">
+        <span class="meta-label">Tempo</span>
+        <span class="meta-val font-mono">72 BPM</span>
+      </div>
+      <div class="meta-box">
+        <span class="meta-label">Birama</span>
+        <span class="meta-val font-mono">4/4</span>
+      </div>
+      <div class="meta-box">
+        <span class="meta-label">Hitungan Awal</span>
+        <span class="meta-val font-mono">2 Bar</span>
+      </div>
+    </div>
+
+    <div class="transport-right">
+      <div class="metronome-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20M8 6l8 12M6 18h12"></path>
+        </svg>
+        <span class="">Metronom</span>
+      </div>
+      <div class="metronome-vol">
+        <div class="vol-label-row">
+          <span class="">Volume Metronom</span>
+          <span class="font-mono">80%</span>
+        </div>
+        <div class="vol-slider-track">
+          <div class="vol-slider-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tracks-list">
+    <!-- TRACK 1: PIANO/ORGEN -->
+    <div class="track-card">
+      <div class="track-strip" style="background-color: #14B8A6;"></div>
+      <div class="track-controls" style="width: 500px; min-width: 500px;">
+        <div class="record-btn recorded">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="track-info-col">
+          <div class="track-header-row">
+            <div class="track-name-dot" style="background-color: #14B8A6;"></div>
+            <div class="track-name" style="white-space: nowrap;">Piano/Orgen</div>
+          </div>
+          <div class="track-input-label">Input 1–2 · Stereo</div>
+          <div class="track-settings-row">
+            <div class="btn-solo-mute">S</div>
+            <div class="btn-solo-mute">M</div>
+            <div class="vol-fader-small">
+              <div class="vol-fader-labels"><span class="">Volume</span><span class="font-mono">0.0 dB</span></div>
+              <div class="vol-track-line"><div class="vol-track-thumb"></div></div>
+            </div>
+            <div class="take-dropdown font-mono">
+              <span class="">Take 1 · 12:45</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="track-display" style="padding-right: 24px;">
+        <div class="waveform-area">
+          <svg class="waveform-svg" viewBox="0 0 900 72" fill="none" preserveAspectRatio="none">
+            <path d="M0 36 C50 15, 70 58, 120 36 C170 14, 190 56, 240 36 C290 12, 310 60, 360 36 C410 10, 430 62, 480 36 C530 8, 550 64, 600 36 C650 6, 670 66, 720 36 C770 10, 790 62, 840 36 L840 36" stroke="#14B8A6" stroke-width="2"></path>
+            <path d="M0 36 L900 36" stroke="#2A3340" stroke-width="1" stroke-dasharray="4 4"></path>
+          </svg>
+        </div>
+        <div class="meter-vertical">
+          <div class="meter-fill" style="height: 65%; background: linear-gradient(to top, #22C55E 0%, #22C55E 70%, #EAB308 100%);"></div>
+          <span class="meter-db-label">-14</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACK 2: BASS -->
+    <div class="track-card">
+      <div class="track-strip" style="background-color: #8B5CF6;"></div>
+      <div class="track-controls" style="width: 500px; min-width: 500px;">
+        <div class="record-btn recorded">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="track-info-col">
+          <div class="track-header-row">
+            <div class="track-name-dot" style="background-color: #8B5CF6;"></div>
+            <div class="track-name" style="white-space: nowrap;">Bass</div>
+          </div>
+          <div class="track-input-label">Input 1 · Mic</div>
+          <div class="track-settings-row">
+            <div class="btn-solo-mute">S</div>
+            <div class="btn-solo-mute">M</div>
+            <div class="vol-fader-small">
+              <div class="vol-fader-labels"><span class="">Volume</span><span class="font-mono">0.0 dB</span></div>
+              <div class="vol-track-line"><div class="vol-track-thumb"></div></div>
+            </div>
+            <div class="take-dropdown font-mono">
+              <span class="">Take 2 · 13:01</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="track-display" style="padding-right: 24px;">
+        <div class="waveform-area">
+          <svg class="waveform-svg" viewBox="0 0 900 72" fill="none" preserveAspectRatio="none">
+            <path d="M0 36 C60 20, 100 52, 160 36 C220 20, 260 52, 320 36 C380 18, 420 54, 480 36 C540 18, 580 54, 640 36 C700 22, 740 50, 800 36" stroke="#8B5CF6" stroke-width="2"></path>
+            <path d="M0 36 L900 36" stroke="#2A3340" stroke-width="1" stroke-dasharray="4 4"></path>
+          </svg>
+        </div>
+        <div class="meter-vertical">
+          <div class="meter-fill" style="height: 55%; background: #22C55E;"></div>
+          <span class="meter-db-label">-18</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACK 3: TENOR -->
+    <div class="track-card">
+      <div class="track-strip" style="background-color: #3B82F6;"></div>
+      <div class="track-controls" style="width: 500px; min-width: 500px;">
+        <div class="record-btn recorded">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="track-info-col">
+          <div class="track-header-row">
+            <div class="track-name-dot" style="background-color: #3B82F6;"></div>
+            <div class="track-name" style="white-space: nowrap;">Tenor</div>
+          </div>
+          <div class="track-input-label">Input 1 · Mic</div>
+          <div class="track-settings-row">
+            <div class="btn-solo-mute">S</div>
+            <div class="btn-solo-mute">M</div>
+            <div class="vol-fader-small">
+              <div class="vol-fader-labels"><span class="">Volume</span><span class="font-mono">0.0 dB</span></div>
+              <div class="vol-track-line"><div class="vol-track-thumb"></div></div>
+            </div>
+            <div class="take-dropdown font-mono">
+              <span class="">Take 1 · 13:10</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="track-display" style="padding-right: 24px;">
+        <div class="waveform-area">
+          <svg class="waveform-svg" viewBox="0 0 900 72" fill="none" preserveAspectRatio="none">
+            <path d="M0 36 C45 25, 75 48, 120 36 C165 24, 195 48, 240 36 C285 22, 315 50, 360 36 C405 20, 435 52, 480 36 C525 24, 555 48, 600 36 C645 22, 675 50, 720 36" stroke="#3B82F6" stroke-width="2"></path>
+            <path d="M0 36 L900 36" stroke="#2A3340" stroke-width="1" stroke-dasharray="4 4"></path>
+          </svg>
+        </div>
+        <div class="meter-vertical">
+          <div class="meter-fill" style="height: 60%; background: #22C55E;"></div>
+          <span class="meter-db-label">-16</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACK 4: ALTO -->
+    <div class="track-card">
+      <div class="track-strip" style="background-color: #F59E0B;"></div>
+      <div class="track-controls" style="width: 500px; min-width: 500px;">
+        <div class="record-btn empty">
+          <div class="inner-dot"></div>
+        </div>
+        <div class="track-info-col">
+          <div class="track-header-row">
+            <div class="track-name-dot" style="background-color: #F59E0B;"></div>
+            <div class="track-name" style="white-space: nowrap;">Alto</div>
+          </div>
+          <div class="track-input-label">Input 1 · Mic</div>
+          <div class="track-settings-row">
+            <div class="btn-solo-mute">S</div>
+            <div class="btn-solo-mute">M</div>
+            <div class="vol-fader-small">
+              <div class="vol-fader-labels"><span class="">Volume</span><span class="font-mono">0.0 dB</span></div>
+              <div class="vol-track-line"><div class="vol-track-thumb"></div></div>
+            </div>
+            <div class="take-dropdown font-mono">
+              <span class="">—</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="track-display" style="padding-right: 24px;">
+        <div class="waveform-area">
+          <span class="empty-track-msg">Belum direkam</span>
+        </div>
+        <div class="meter-vertical">
+          <span class="meter-db-label">-inf</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACK 5: SOPRAN -->
+    <div class="track-card">
+      <div class="track-strip" style="background-color: #EF4444;"></div>
+      <div class="track-controls" style="width: 500px; min-width: 500px;">
+        <div class="record-btn empty">
+          <div class="inner-dot"></div>
+        </div>
+        <div class="track-info-col">
+          <div class="track-header-row">
+            <div class="track-name-dot" style="background-color: #EF4444;"></div>
+            <div class="track-name" style="white-space: nowrap;">Sopran</div>
+          </div>
+          <div class="track-input-label">Input 1 · Mic</div>
+          <div class="track-settings-row">
+            <div class="btn-solo-mute">S</div>
+            <div class="btn-solo-mute">M</div>
+            <div class="vol-fader-small">
+              <div class="vol-fader-labels"><span class="">Volume</span><span class="font-mono">0.0 dB</span></div>
+              <div class="vol-track-line"><div class="vol-track-thumb"></div></div>
+            </div>
+            <div class="take-dropdown font-mono">
+              <span class="">—</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="track-display" style="padding-right: 24px;">
+        <div class="waveform-area">
+          <span class="empty-track-msg">Belum direkam</span>
+        </div>
+        <div class="meter-vertical">
+          <span class="meter-db-label">-inf</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="production-bar" style="padding-right: 32px; padding-left: 24px;">
+    <div class="reverb-controls">
+      <div class="reverb-group">
+        <span class="group-label">Ruang</span>
+        <div class="segmented-control">
+          <div class="seg-item">Gereja Kecil</div>
+          <div class="seg-item">Aula</div>
+          <div class="seg-item active">Katedral</div>
+        </div>
+      </div>
+      <div class="reverb-group">
+        <span class="group-label">Jumlah Reverb</span>
+        <div class="segmented-control">
+          <div class="seg-item">Sedikit</div>
+          <div class="seg-item active">Normal</div>
+          <div class="seg-item">Banyak</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="master-btn-container">
+      <button class="btn-master" disabled="" style="white-space: nowrap; flex-shrink: 0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+        </svg>
+        <span class="">Proses Produksi &amp; Master</span>
+      </button>
+      <span class="master-hint" style="white-space: nowrap;">Rekam kelima track terlebih dahulu</span>
+    </div>
+  </div>
+
+  <!-- ERROR MODAL DIALOG OVERLAY (60% BLACK OVERLAY) -->
+  <div class="modal-overlay">
+    <div class="error-dialog">
+      <div class="dialog-header">
+        <div class="warning-icon-wrapper">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <div class="header-text">
+          <h2 class="dialog-title">Sound card terputus</h2>
+          <p class="dialog-body">Sambungan ke SPL Audio SC202HD hilang saat merekam. Rekaman Alto sampai detik 01:24 sudah tersimpan dengan aman.</p>
+          <p class="dialog-secondary">Periksa kabel USB, lalu tekan Hubungkan Ulang.</p>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="btn-outline">Tutup</button>
+        <button class="btn-primary">Hubungkan Ulang</button>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+</body></html>

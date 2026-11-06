@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HarmoniSATB Studio - Proyek Lagu</title>
+<!-- Google Fonts: Inter & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-config">
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0E1116;
+      color: #E6EDF3;
+      user-select: none;
+      overflow: hidden;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="bg-[#0E1116] flex items-center justify-center min-h-screen m-0 p-0">
+<!-- BEGIN: DesktopWindowFrame -->
+<div class="w-[1440px] h-[900px] bg-[#0E1116] text-[#E6EDF3] flex flex-col relative overflow-hidden shadow-2xl border border-[#2A3340]/40">
+<!-- BEGIN: TopBar -->
+<header class="w-full h-[56px] bg-[#161B22] border-b border-[#2A3340] px-6 flex items-center justify-between shrink-0" data-purpose="top-bar">
+<!-- Left: Application Brand Identity -->
+<div class="flex items-center gap-3">
+<svg class="w-[22px] h-[22px] text-[#8B98A5]" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[20px] font-semibold text-[#E6EDF3] tracking-tight">HarmoniSATB Studio</span>
+</div>
+<!-- Right: Settings Action Button -->
+<button class="flex items-center gap-2 px-3 py-1.5 bg-[#1F2630] border border-[#2A3340] rounded-[8px] text-[14px] text-[#E6EDF3] hover:bg-[#2A3340] transition-colors" data-purpose="settings-button" type="button">
+<svg class="w-4 h-4 text-[#8B98A5]" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Pengaturan</span>
+</button>
+</header>
+<!-- END: TopBar -->
+<!-- BEGIN: MainContent -->
+<main class="w-[960px] mx-auto pt-12 flex-1 flex flex-col" data-purpose="project-list-view">
+<!-- BEGIN: TitleRow -->
+<div class="flex items-center justify-between mb-8" data-purpose="header-action-row">
+<div>
+<h1 class="text-[28px] font-bold text-[#E6EDF3] leading-none">Proyek Lagu</h1>
+<p class="text-[16px] text-[#8B98A5] mt-2 font-normal">Satu proyek untuk satu lagu.</p>
+</div>
+<!-- Primary Action: New Project -->
+<button class="h-[56px] px-8 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold rounded-[12px] flex items-center gap-[10px] text-[16px] transition-colors shadow-sm" data-purpose="new-project-button" type="button">
+<svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Proyek Baru</span>
+</button>
+</div>
+<!-- END: TitleRow -->
+<!-- BEGIN: RecentProjectsSection -->
+<section data-purpose="recent-projects-list">
+<!-- Section Subtitle Label -->
+<h2 class="text-[14px] font-medium text-[#8B98A5] uppercase tracking-wider mb-4">Proyek Terakhir</h2>
+<!-- Projects Rows List -->
+<div class="space-y-3">
+<!-- Row 1: Bapa Engkau Sungguh Baik -->
+<div class="h-[80px] bg-[#161B22] rounded-[8px] border border-[#2A3340] px-6 flex items-center justify-between hover:border-[#3B82F6] transition-colors cursor-pointer group" data-purpose="project-card">
+<!-- Left Group: Title & Metronome Info -->
+<div class="flex flex-col justify-center">
+<span class="text-[18px] font-semibold text-[#E6EDF3] group-hover:text-white transition-colors">Bapa Engkau Sungguh Baik</span>
+<span class="text-[14px] font-mono text-[#8B98A5] mt-1">72 BPM · 4/4</span>
+</div>
+<!-- Center Group: 5 Track Recording Status Circles -->
+<div class="flex items-center gap-2" data-purpose="track-indicators" title="Piano, Bass, Tenor, Alto, Sopran">
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Piano (Terekam)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Bass (Terekam)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Tenor (Terekam)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Alto (Terekam)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Sopran (Terekam)"></span>
+</div>
+<!-- Right Group: Last Modified & Navigation Icon -->
+<div class="flex items-center gap-6">
+<span class="text-[14px] font-mono text-[#8B98A5]">06-11-2026 13:05</span>
+<svg class="w-5 h-5 text-[#8B98A5] group-hover:text-[#E6EDF3] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</div>
+<!-- Row 2: Kudus, Kudus, Kudus -->
+<div class="h-[80px] bg-[#161B22] rounded-[8px] border border-[#2A3340] px-6 flex items-center justify-between hover:border-[#3B82F6] transition-colors cursor-pointer group" data-purpose="project-card">
+<!-- Left Group -->
+<div class="flex flex-col justify-center">
+<span class="text-[18px] font-semibold text-[#E6EDF3] group-hover:text-white transition-colors">Kudus, Kudus, Kudus</span>
+<span class="text-[14px] font-mono text-[#8B98A5] mt-1">66 BPM · 4/4</span>
+</div>
+<!-- Center Group: Track Dots (Piano, Bass, Tenor recorded; Alto, Sopran empty) -->
+<div class="flex items-center gap-2" data-purpose="track-indicators" title="Piano, Bass, Tenor, Alto, Sopran">
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Piano (Terekam)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Bass (Terekam)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Tenor (Terekam)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Alto (Kosong)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Sopran (Kosong)"></span>
+</div>
+<!-- Right Group -->
+<div class="flex items-center gap-6">
+<span class="text-[14px] font-mono text-[#8B98A5]">05-11-2026 19:40</span>
+<svg class="w-5 h-5 text-[#8B98A5] group-hover:text-[#E6EDF3] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</div>
+<!-- Row 3: Malam Kudus -->
+<div class="h-[80px] bg-[#161B22] rounded-[8px] border border-[#2A3340] px-6 flex items-center justify-between hover:border-[#3B82F6] transition-colors cursor-pointer group" data-purpose="project-card">
+<!-- Left Group -->
+<div class="flex flex-col justify-center">
+<span class="text-[18px] font-semibold text-[#E6EDF3] group-hover:text-white transition-colors">Malam Kudus</span>
+<span class="text-[14px] font-mono text-[#8B98A5] mt-1">60 BPM · 6/8</span>
+</div>
+<!-- Center Group: Track Dots (Piano recorded; others empty) -->
+<div class="flex items-center gap-2" data-purpose="track-indicators" title="Piano, Bass, Tenor, Alto, Sopran">
+<span class="w-[12px] h-[12px] rounded-full bg-[#22C55E]" title="Piano (Terekam)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Bass (Kosong)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Tenor (Kosong)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Alto (Kosong)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Sopran (Kosong)"></span>
+</div>
+<!-- Right Group -->
+<div class="flex items-center gap-6">
+<span class="text-[14px] font-mono text-[#8B98A5]">02-11-2026 20:12</span>
+<svg class="w-5 h-5 text-[#8B98A5] group-hover:text-[#E6EDF3] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</div>
+<!-- Row 4: Haleluya Puji Tuhan -->
+<div class="h-[80px] bg-[#161B22] rounded-[8px] border border-[#2A3340] px-6 flex items-center justify-between hover:border-[#3B82F6] transition-colors cursor-pointer group" data-purpose="project-card">
+<!-- Left Group -->
+<div class="flex flex-col justify-center">
+<span class="text-[18px] font-semibold text-[#E6EDF3] group-hover:text-white transition-colors">Haleluya Puji Tuhan</span>
+<span class="text-[14px] font-mono text-[#8B98A5] mt-1">96 BPM · 3/4</span>
+</div>
+<!-- Center Group: Track Dots (All empty) -->
+<div class="flex items-center gap-2" data-purpose="track-indicators" title="Piano, Bass, Tenor, Alto, Sopran">
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Piano (Kosong)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Bass (Kosong)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Tenor (Kosong)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Alto (Kosong)"></span>
+<span class="w-[12px] h-[12px] rounded-full bg-[#4B5563]" title="Sopran (Kosong)"></span>
+</div>
+<!-- Right Group -->
+<div class="flex items-center gap-6">
+<span class="text-[14px] font-mono text-[#8B98A5]">28-10-2026 18:30</span>
+<svg class="w-5 h-5 text-[#8B98A5] group-hover:text-[#E6EDF3] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Open Other Project Secondary Action -->
+<div class="mt-6">
+<button class="text-[15px] text-[#8B98A5] hover:text-[#E6EDF3] flex items-center gap-1.5 transition-colors cursor-pointer py-1" data-purpose="open-other-project-link" type="button">
+<span>Buka Proyek Lain…</span>
+</button>
+</div>
+</section>
+<!-- END: RecentProjectsSection -->
+</main>
+<!-- END: MainContent -->
+<div class="absolute inset-0 z-50 flex items-center justify-center" data-purpose="modal-overlay" style="background-color: rgba(0, 0, 0, 0.6);">
+<!-- Modal Dialog Container -->
+<div class="w-[560px] bg-[#161B22] border border-[#2A3340] rounded-[12px] p-8 flex flex-col gap-5 text-[#E6EDF3]" data-purpose="new-project-modal" style="box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);">
+<!-- Header Row -->
+<div class="flex items-center justify-between">
+<h2 class="text-[24px] font-bold text-[#E6EDF3] leading-none">Proyek Baru</h2>
+<button aria-label="Tutup" class="text-[#8B98A5] hover:text-white transition-colors cursor-pointer p-1 rounded" type="button">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- Field 1: Judul Lagu -->
+<div class="flex flex-col">
+<label class="text-[14px] text-[#8B98A5] font-medium mb-[6px]">Judul Lagu</label>
+<input class="h-[48px] bg-[#1F2630] border border-[#2A3340] rounded-[8px] px-4 text-[#E6EDF3] text-[16px] placeholder-[#8B98A5]/50 focus:outline-none focus:border-[#3B82F6] transition-colors" placeholder="Contoh: Bapa Engkau Sungguh Baik" type="text"/>
+</div>
+<!-- Field 2 & 3: Tempo (BPM) & Birama -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Left Column: Tempo (BPM) -->
+<div class="flex flex-col">
+<label class="text-[14px] text-[#8B98A5] font-medium mb-[6px]">Tempo (BPM)</label>
+<div class="h-[48px] bg-[#1F2630] border border-[#2A3340] rounded-[8px] flex items-center justify-between px-2">
+<button class="w-8 h-8 rounded flex items-center justify-center text-[#8B98A5] hover:text-[#E6EDF3] hover:bg-[#2A3340] transition-colors text-[18px] font-bold" type="button">
+            −
+          </button>
+<span class="font-mono text-[18px] font-semibold text-[#E6EDF3] text-center">72</span>
+<button class="w-8 h-8 rounded flex items-center justify-center text-[#8B98A5] hover:text-[#E6EDF3] hover:bg-[#2A3340] transition-colors text-[18px] font-bold" type="button">
+            +
+          </button>
+</div>
+<span class="text-[13px] text-[#8B98A5] font-mono mt-1">40 – 240</span>
+</div>
+<!-- Right Column: Birama -->
+<div class="flex flex-col">
+<label class="text-[14px] text-[#8B98A5] font-medium mb-[6px]">Birama</label>
+<div class="h-[48px] bg-[#1F2630] border border-[#2A3340] rounded-[8px] p-1 grid grid-cols-4 gap-1">
+<button class="flex items-center justify-center text-[#8B98A5] font-mono text-[14px] hover:text-[#E6EDF3] rounded transition-colors" type="button">2/4</button>
+<button class="flex items-center justify-center text-[#8B98A5] font-mono text-[14px] hover:text-[#E6EDF3] rounded transition-colors" type="button">3/4</button>
+<button class="flex items-center justify-center bg-[#3B82F6] text-white font-mono text-[14px] font-semibold rounded-[6px]" type="button">4/4</button>
+<button class="flex items-center justify-center text-[#8B98A5] font-mono text-[14px] hover:text-[#E6EDF3] rounded transition-colors" type="button">6/8</button>
+</div>
+</div>
+</div>
+<!-- Field 4: Hitungan Awal -->
+<div class="flex flex-col">
+<label class="text-[14px] text-[#8B98A5] font-medium mb-[6px]">Hitungan Awal</label>
+<div class="h-[44px] bg-[#1F2630] border border-[#2A3340] rounded-[8px] p-1 grid grid-cols-3 gap-1">
+<button class="flex items-center justify-center text-[#8B98A5] text-[14px] hover:text-[#E6EDF3] rounded transition-colors" type="button">Tanpa</button>
+<button class="flex items-center justify-center text-[#8B98A5] text-[14px] hover:text-[#E6EDF3] rounded transition-colors" type="button">1 Bar</button>
+<button class="flex items-center justify-center bg-[#3B82F6] text-white text-[14px] font-semibold rounded-[6px]" type="button">2 Bar</button>
+</div>
+</div>
+<!-- Field 5: Toggle Switch -->
+<div class="flex flex-col">
+<div class="flex items-center justify-between">
+<label class="text-[15px] text-[#E6EDF3] font-medium">Metronom tetap bunyi setelah hitungan awal</label>
+<div class="w-[48px] h-[26px] bg-[#3B82F6] rounded-full p-[3px] flex items-center justify-end cursor-pointer transition-colors">
+<div class="w-5 h-5 bg-white rounded-full shadow-md"></div>
+</div>
+</div>
+<span class="text-[13px] text-[#8B98A5] mt-1">Matikan untuk lagu bertempo bebas.</span>
+</div>
+<!-- Field 6 / Footer -->
+<div class="flex items-center justify-end gap-3 mt-2">
+<button class="h-[48px] px-5 border border-[#2A3340] bg-transparent rounded-[8px] text-[#E6EDF3] text-[15px] font-medium hover:bg-[#1F2630] transition-colors cursor-pointer" type="button">
+        Batal
+      </button>
+<button class="h-[48px] px-6 bg-[#3B82F6] hover:bg-[#2563EB] text-white text-[15px] font-semibold rounded-[8px] transition-colors shadow-sm cursor-pointer" type="button">
+        Buat Proyek
+      </button>
+</div>
+</div>
+</div></div>
+<!-- END: DesktopWindowFrame -->
+</body></html>
