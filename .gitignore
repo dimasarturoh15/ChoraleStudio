@@ -2,6 +2,7 @@
 .venv/
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # Build
 build/
@@ -12,12 +13,18 @@ dist/
 *.wav
 *.mp3
 *.flac
+*.aif
+*.aiff
+*.ogg
+*.m4a
 projects/
 recordings/
 
 # Model AI
 *.pt
+*.pth
 *.onnx
+*.ckpt
 
 # Sistem
 .vscode/settings.json

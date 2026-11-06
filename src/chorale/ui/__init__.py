@@ -1,0 +1,1 @@
+"""Antarmuka grafis PySide6."""
