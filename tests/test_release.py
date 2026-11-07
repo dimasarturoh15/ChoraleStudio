@@ -32,8 +32,8 @@ def fresh_logging(isolated_appdata):
 
 
 def test_version():
-    assert __version__ == "1.2.0"
-    assert 'version = "1.2.0"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "1.3.0"
+    assert 'version = "1.3.0"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_log_file_rotating_in_appdata(fresh_logging, isolated_appdata):
@@ -44,7 +44,7 @@ def test_log_file_rotating_in_appdata(fresh_logging, isolated_appdata):
     logging.getLogger("chorale.test").warning("pesan uji")
     handler.flush()
     text = (folder / "harmonisatb.log").read_text(encoding="utf-8")
-    assert "HarmoniSATB Studio 1.2.0 dimulai" in text and "pesan uji" in text
+    assert "HarmoniSATB Studio 1.3.0 dimulai" in text and "pesan uji" in text
 
 
 def test_unhandled_errors_are_logged_and_shown_friendly(fresh_logging):

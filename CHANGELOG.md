@@ -4,6 +4,8 @@ Semua perubahan penting pada HarmoniSATB Studio dicatat di berkas ini. Formatnya
 
 ## [Belum dirilis]
 
+## [1.3.0] - 2026-11-08
+
 ### Ditambahkan
 
 - Cek gain untuk setiap kelompok suara: saat pertama kali merekam suara vokal berikutnya, Persiapan Rekam Vokal terbuka langsung di langkah "Atur Gain Mic". Rekam ulang suara yang sama tidak ditanya lagi.
@@ -91,6 +93,7 @@ Rilis pertama yang lengkap secara fitur sesuai [PRD v1.1](docs/PRD_v1.1.md), sia
 - Uji dengan SPL Audio SC202HD (kalibrasi, sinkronisasi, stress test, rekaman nyanyian) belum dilakukan.
 - DeepFilterNet belum dipakai.
 
-[Belum dirilis]: https://github.com/dimasarturoh15/ChoraleStudio/compare/v1.2.0...HEAD
+[Belum dirilis]: https://github.com/dimasarturoh15/ChoraleStudio/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/dimasarturoh15/ChoraleStudio/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/dimasarturoh15/ChoraleStudio/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/dimasarturoh15/ChoraleStudio/releases/tag/v1.1.0

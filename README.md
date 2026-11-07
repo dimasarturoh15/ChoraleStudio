@@ -6,7 +6,7 @@
 
 **Rekam paduan suara SATB dan piano secara bergiliran, lalu buat master siap YouTube dengan satu klik.**
 
-![Versi](https://img.shields.io/badge/versi-1.2.0-2f81f7)
+![Versi](https://img.shields.io/badge/versi-1.3.0-2f81f7)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078d4)
 ![Python](https://img.shields.io/badge/python-3.12-3776ab)
 ![Antarmuka](https://img.shields.io/badge/UI-PySide6%20(Qt%206)-41cd52)
@@ -138,7 +138,7 @@ Prioritas driver: **ASIO** (bila tersedia) → **WASAPI Exclusive** → **WASAPI
 
 Rilis unduhan belum diterbitkan. Sampai saat itu, `Setup.exe` dibuat dari kode sumber (lihat [Membuat installer](#membuat-installer)), lalu:
 
-1. Jalankan `HarmoniSATB-Studio-1.2.0-Setup.exe` dan ikuti langkahnya. Hak admin tidak diperlukan.
+1. Jalankan `HarmoniSATB-Studio-1.3.0-Setup.exe` dan ikuti langkahnya. Hak admin tidak diperlukan.
 2. Buka **HarmoniSATB Studio** dari Start Menu atau Desktop.
 3. Peluncuran pertama bisa 20 sampai 50 detik karena Windows Defender memindai berkas baru.
 
@@ -269,7 +269,7 @@ ChoraleStudio/
 
 ## Status proyek
 
-Versi **1.2.0** lengkap secara fitur, sudah diuji dengan SPL Audio SC202HD, dan siap uji lapangan. Ringkasan kriteria penerimaan (PRD bagian 10):
+Versi **1.3.0** lengkap secara fitur, sudah diuji dengan SPL Audio SC202HD, dan siap uji lapangan. Ringkasan kriteria penerimaan (PRD bagian 10):
 
 | Kriteria | Target | Status |
 |---|---|---|

@@ -622,3 +622,9 @@ Mode `--acuan-satu-kabel`: take vokal (loopback playback) sekaligus menjadi acua
 - Alasan: volume tiap kelompok berbeda dan operator baru mudah lupa mengecek gain setelah kelompok pertama.
 - Tes diperbarui (`test_record_piano_then_vocal_with_guide`) dan ditambah (`test_gain_check_can_be_cancelled`).
 - **Diperbaiki:** `tools/ui_screenshots.py` belum memperhitungkan pemanasan 5 detik, sehingga screenshot 12 yang ter-commit di rilis 1.2.0 menampilkan "sampai detik 00:00". Kini kembali 00:03; skrip juga melewati cek gain.
+
+## Rilis 1.3.0 (08-11-2026)
+
+- Berisi cek gain per kelompok suara vokal (lihat bagian sebelumnya).
+- Versi 1.3.0 di aplikasi, pyproject, skrip Inno Setup, README, panduan; CHANGELOG 1.3.0.
+- `HarmoniSATB-Studio-1.3.0-Setup.exe` (87 MB) dibangun; aplikasi hasil build lulus uji tanpa Python di PATH. Dipasang menimpa 1.2.0 di laptop ini dan diuji lagi dari folder instalasi: buka/tutup kode 0, `--uji-mandiri` LULUS (−14,04 LUFS).
