@@ -37,6 +37,7 @@ import soundfile as sf  # noqa: E402
 
 SR = 48000
 LIMIT_SAMPLES = 48  # 1 ms
+MIN_PEAK_DBFS = -50.0
 TEMPO = 120
 
 INSTRUCTIONS = """\
@@ -122,8 +123,10 @@ def main() -> int:
             offsets[track] = est.lag_fractional
             print(f"  {TRACK_LABELS[track]:<12} {est.lag_fractional:+8.2f} sampel ({est.lag_fractional / 48:+6.3f} ms)"
                   f"  {est.quality:9.0f}  {peak:6.1f} dBFS")
-            if est.quality < 20:
-                print("    -> Klik tidak tertangkap jelas. Cek kabel loopback dan gain input.")
+            # Derau saja bisa menghasilkan keyakinan ratusan, jadi level puncak ikut diperiksa.
+            if est.quality < 1000 or peak < MIN_PEAK_DBFS:
+                print(f"    -> Klik tidak tertangkap jelas (puncak di bawah {MIN_PEAK_DBFS:g} dBFS atau keyakinan "
+                      "rendah). Naikkan gain Input 1 sampai lampu sinyal menyala tanpa clip.")
                 return 1
 
         spread = max(abs(a - b) for a, b in itertools.combinations(offsets.values(), 2))

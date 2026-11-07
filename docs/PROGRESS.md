@@ -540,3 +540,27 @@ Aplikasi dijalankan sungguhan (`python -m chorale`) dan tertutup normal.
 - **Diperbaiki:** `installer/harmonisatb.spec` ternyata tidak pernah masuk repositori karena aturan `*.spec` di `.gitignore`; kini dikecualikan sehingga installer bisa dibuat dari hasil clone.
 - Keputusan pengguna: repositori publik **tanpa lisensi open-source** (hak cipta dilindungi). Lisensi pihak ketiga (GPL v3 untuk pedalboard dan FFmpeg) dijelaskan di THIRD_PARTY_NOTICES.md.
 - Semua tautan relatif dan anchor di dokumen baru dicek otomatis: 0 rusak.
+
+---
+
+## Uji hardware SPL Audio SC202HD (07-11-2026)
+
+SC202HD akhirnya tersambung. Chip di dalamnya **Realtek** (USB `VID_0BDA&PID_4E1F`) dengan driver USB audio generik Microsoft (`wdma_usb.inf`); tidak ada driver ASIO resmi.
+
+| Uji | Hasil |
+|---|---|
+| `list_devices.py` | Terdeteksi di MME, DirectSound, WASAPI, WDM-KS; 2 in / 2 out, 48 kHz |
+| `test_wasapi.py` | WASAPI Exclusive 48 kHz buffer 256: input 1 dan 2 kanal, output 2 kanal, rekam+putar **0 dropout**; 2 input bisa direkam terpisah |
+| `calibrate_latency.py` (loopback) | Sekitar 20–21 ms, tetapi **tidak konsisten antar-stream**: contoh [1005, 1007, 957, 897, 1072] sampel |
+| `sync_test.py` (5 track) | Selisih terbesar **1,33 ms** dan 1,49 ms pada dua putaran (batas PRD 1 ms) → **tidak lulus**; 0 dropout |
+
+**Temuan (eksperimen di luar alat standar):**
+- Latensi rekam-putar berubah setiap kali stream dibuka. Pada buffer 128/256/512/1024 sebarannya 2–3 ms antar-stream, kadang sampai sekitar 10 ms. Nilai mengumpul dengan jarak sekitar 1 ms (paket USB).
+- Di dalam satu stream, latensi kadang **melompat naik 2–8 ms tanpa laporan error dari PortAudio** (kebanyakan dalam 3–6 detik pertama, kadang di tengah). Lompatan selalu naik, sehingga kemungkinan besar driver menyisipkan jeda pada output (playback). Akibatnya penghitung dropout di `stress_test.py` tidak bisa mendeteksinya.
+- Cap waktu PortAudio (`time_info`, `stream.latency`) konstan, jadi variasi ini tidak bisa dideteksi atau dikoreksi otomatis.
+- Kondisi laptop berpengaruh: semula berjalan dengan baterai, USB selective suspend aktif, dan FxSound aktif. Setelah charger dicolok, USB selective suspend dinonaktifkan (`powercfg`, AC dan DC), dan FxSound dihentikan, lompatan di dalam stream berkurang, tetapi tidak hilang.
+- WASAPI Shared jauh lebih buruk (latensi 200–280 ms, melompat ratusan ms), tidak layak dipakai.
+
+**Diperbaiki:** `tools/sync_test.py` kini menolak take yang puncaknya di bawah -50 dBFS atau keyakinannya di bawah 1000. Sebelumnya, take berisi derau (gain loopback terlalu kecil) lolos dan menghasilkan angka selisih yang tidak bermakna (9 ms pada uji pertama).
+
+**Status:** kriteria Sinkronisasi (≤ 1 ms) belum terpenuhi karena batasan driver SC202HD. Keputusan arah ada di pengguna (lihat laporan 07-11-2026). Stress test 60 menit di SC202HD dan rekaman suara asli belum dijalankan.
