@@ -2,6 +2,9 @@
 
 Garis waktu lagu: frame 0 = awal birama setelah count-in. Stream dimulai
 `count_in_frames` sebelum frame 0, jadi selama count-in posisi lagu negatif.
+Saat merekam, stream bisa dimulai `warmup_frames` lebih awal lagi (hening, tidak
+direkam): driver USB generik (mis. SC202HD) sering menggeser latensinya dalam
+detik-detik pertama stream, dan pergeseran itu tidak dilaporkan PortAudio.
 
 Callback hanya: menyalin buffer putar ke output, menambah klik metronom,
 menghitung puncak input, dan menyalin input ke ring buffer perekam. Semua
@@ -36,11 +39,12 @@ from chorale.project.model import Project, Take
 
 _FLAGS = ("input_overflow", "input_underflow", "output_underflow", "output_overflow")
 COMPLETE_RATIO = 0.9
+WARMUP_SECONDS = 5.0  # pemanasan sebelum hitungan awal saat merekam (uji SC202HD 07-11-2026)
 
 MSG_NO_CALIBRATION = (
     "Belum ada kalibrasi latensi untuk sound card ini (buffer {blocksize}). Dipakai perkiraan "
     "driver ({ms:.1f} ms), sehingga track bisa sedikit tidak sejajar. Jalankan kalibrasi "
-    "latensi agar selisih antar-track <= 1 ms."
+    "latensi agar selisih antar-track <= 3 ms."
 )
 MSG_TOO_SHORT = (
     "Take ini lebih pendek dari 90% durasi piano, jadi ditandai tidak lengkap."
@@ -83,12 +87,14 @@ class AudioSession:
         device_timeout: float = 1.0,
         stream_factory=open_duplex_stream,
         playback_mix: np.ndarray | None = None,
+        warmup_seconds: float = 0.0,
     ):
         """
         metronome: klik selama lagu (None = ikuti pengaturan proyek).
         count_in: pakai hitungan awal (None = ya saat merekam, tidak saat hanya memutar).
         latency_samples: paksa nilai latensi; None = dari kalibrasi, atau perkiraan driver.
         playback_mix: buffer stereo yang diputar sebagai ganti campuran proyek (mis. pratinjau satu take).
+        warmup_seconds: hening sebelum hitungan awal, hanya saat merekam (lihat WARMUP_SECONDS).
         """
         self.project = project
         self.selection = selection
@@ -119,6 +125,7 @@ class AudioSession:
             volume_db=metronome_volume_db,
         )
         self.count_in_frames = self.metronome.count_in_frames
+        self.warmup_frames = int(round(warmup_seconds * SAMPLE_RATE)) if record_track is not None else 0
 
         # Latensi dari kalibrasi (jika ada); jika tidak, diisi dari driver saat start().
         self.latency_samples = latency_samples
@@ -135,8 +142,8 @@ class AudioSession:
             playback_mix = build_monitor_mix(project, exclude=record_track, gain_db=monitor_gain_db)
         self.player = Player(playback_mix)
         start_frame = int(round(start_seconds * SAMPLE_RATE)) if record_track is None else 0
-        self.player.seek(start_frame - self.count_in_frames)
-        self._song_frame = start_frame - self.count_in_frames
+        self.player.seek(start_frame - self.count_in_frames - self.warmup_frames)
+        self._song_frame = start_frame - self.count_in_frames - self.warmup_frames
         self.meter = LevelMeter(selection.input_channels)
         self.recorder: Recorder | None = None
         self.take_id: int | None = None
@@ -198,6 +205,15 @@ class AudioSession:
     @property
     def song_seconds(self) -> float:
         return self._song_frame / SAMPLE_RATE
+
+    @property
+    def count_in_seconds(self) -> float:
+        return self.count_in_frames / SAMPLE_RATE
+
+    @property
+    def warming_up(self) -> bool:
+        """Masih dalam pemanasan (sebelum hitungan awal dimulai)."""
+        return self._song_frame < -self.count_in_frames
 
     @property
     def device_lost(self) -> bool:

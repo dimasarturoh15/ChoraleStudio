@@ -27,6 +27,7 @@ from chorale.ui.widgets import SegmentedControl, TopBar, button, hbox, label, re
 
 FPS = 30
 MSG_NEED_ALL = "Rekam kelima track terlebih dahulu"
+MSG_WARMING_UP = "Menyiapkan sound card …"
 
 
 def fmt_clock(seconds: float) -> str:
@@ -617,6 +618,8 @@ class RecordingScreen(QWidget):
             self.refresh_tracks()
 
         pos = st.position
+        if st.warming_up:
+            pos = -st.count_in_seconds  # jam berhenti di awal hitungan selama pemanasan
         self.clock.setText(fmt_clock(pos))
         recording = st.mode == RECORDING
         rec_track = self.controller.record_track if recording else None
@@ -625,7 +628,11 @@ class RecordingScreen(QWidget):
             self.strips[rec_track].record.blink_on = self._blink < FPS // 2
             self.strips[rec_track].record.update()
             beats = math.ceil(-pos * self.project.tempo / 60) if pos < 0 else 0
-            self.banner_hint.setText(f"Hitungan awal … {beats}" if pos < 0 else "Tekan Stop untuk selesai")
+            if st.warming_up:
+                hint = MSG_WARMING_UP
+            else:
+                hint = f"Hitungan awal … {beats}" if pos < 0 else "Tekan Stop untuk selesai"
+            self.banner_hint.setText(hint)
             self._update_view_length(pos)
 
         # Meter & playhead

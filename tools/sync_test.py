@@ -1,4 +1,4 @@
-"""Uji sinkron 5 track lewat kabel loopback (gerbang Sprint 1: selisih <= 1 ms).
+"""Uji sinkron 5 track lewat kabel loopback (kriteria PRD: selisih <= 3 ms).
 
 Langkah:
   1. Piano direkam: metronom berbunyi ke output, masuk lagi lewat kabel loopback.
@@ -29,14 +29,14 @@ from tools._common import heading, setup_console  # noqa: E402
 from chorale.audio.calibration import estimate_delay, find_calibration  # noqa: E402
 from chorale.audio.device import BLOCKSIZE_CHOICES, DEFAULT_BLOCKSIZE, AudioDeviceError, select_device  # noqa: E402
 from chorale.audio.metronome import Metronome  # noqa: E402
-from chorale.audio.session import AudioSession  # noqa: E402
+from chorale.audio.session import WARMUP_SECONDS, AudioSession  # noqa: E402
 from chorale.project import TRACK_IDS, TRACK_LABELS, create_project  # noqa: E402
 
 import numpy as np  # noqa: E402
 import soundfile as sf  # noqa: E402
 
 SR = 48000
-LIMIT_SAMPLES = 48  # 1 ms
+LIMIT_SAMPLES = 144  # 3 ms (PRD v1.1, diubah 07-11-2026 setelah uji SC202HD)
 MIN_PEAK_DBFS = -50.0
 TEMPO = 120
 
@@ -53,6 +53,7 @@ Bunyi yang diputar: klik metronom 120 BPM, sekitar {total:.0f} detik total."""
 
 def record(project, selection, track, seconds, blocksize, metronome) -> tuple:
     session = AudioSession(project, selection, record_track=track, blocksize=blocksize,
+                           warmup_seconds=WARMUP_SECONDS,
                            record_channels=1, metronome=metronome, metronome_volume_db=-12.0)
     session.start()
     while session.song_seconds < seconds:
@@ -131,7 +132,7 @@ def main() -> int:
 
         spread = max(abs(a - b) for a, b in itertools.combinations(offsets.values(), 2))
         print()
-        print(f"  Selisih terbesar antar-track : {spread:.2f} sampel = {spread / 48:.3f} ms (batas 1 ms)")
+        print(f"  Selisih terbesar antar-track : {spread:.2f} sampel = {spread / 48:.3f} ms (batas 3 ms)")
         print(f"  Total dropout                : {dropouts}")
         ok = spread <= LIMIT_SAMPLES and dropouts == 0
         print("  -> LULUS: 5 track sejajar." if ok else "  -> TIDAK LULUS.")

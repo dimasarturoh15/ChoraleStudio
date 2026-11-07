@@ -84,6 +84,8 @@ class FakeMonitor:
 
 def controller_factory(die_after=None, connect_ok=True):
     class FakeController(AudioController):
+        warmup_seconds = 0.0  # stream palsu pendek; pemanasan diuji di test_warmup_loopback.py
+
         def __init__(self, project, settings):
             super().__init__(project, settings,
                              stream_factory=lambda sel, cb, bs, finished_callback=None: FakeStream(cb, die_after),

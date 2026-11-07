@@ -20,7 +20,7 @@ from chorale.audio.meter import to_dbfs
 from chorale.audio.monitor import InputMonitor
 from chorale.audio.player import load_take_audio
 from chorale.audio.recorder import check_free_space
-from chorale.audio.session import AudioSession
+from chorale.audio.session import WARMUP_SECONDS, AudioSession
 from chorale.project.model import Project, Take
 from chorale.settings import AppSettings
 
@@ -46,6 +46,8 @@ class PollState:
     input_peaks: np.ndarray            # linear, per kanal input sound card
     input_clip: np.ndarray
     recorded_seconds: float = 0.0
+    warming_up: bool = False           # pemanasan sound card sebelum hitungan awal
+    count_in_seconds: float = 0.0
     finished: Take | None = None       # take yang baru selesai direkam (sekali)
     stopped: bool = False              # sesi baru saja berhenti (sekali)
     loss: DeviceLoss | None = None     # sound card terputus (sekali)
@@ -54,6 +56,8 @@ class PollState:
 
 
 class AudioController:
+    warmup_seconds = WARMUP_SECONDS  # tes dengan stream palsu boleh mengecilkannya
+
     def __init__(self, project: Project, settings: AppSettings, stream_factory=None,
                  monitor_factory=InputMonitor):
         """stream_factory/monitor_factory bisa diganti (tes tanpa sound card)."""
@@ -199,7 +203,8 @@ class AudioController:
             if record_track is not None:
                 first, count = self.input_channels_for(record_track)
                 return AudioSession(project, selection, record_track=record_track,
-                                    input_first_channel=first, record_channels=count, **kwargs)
+                                    input_first_channel=first, record_channels=count,
+                                    warmup_seconds=self.warmup_seconds, **kwargs)
             if preview_path is not None:
                 audio = load_take_audio(preview_path)
                 mix = np.repeat(audio[:, :1], 2, axis=1) if audio.shape[1] == 1 else audio[:, :2]
@@ -298,6 +303,8 @@ class AudioController:
             input_clip=clip,
             recorded_seconds=(self.session.recorder.frames_written / 48000
                               if self.session is not None and self.session.recorder else 0.0),
+            warming_up=self.session.warming_up if self.session is not None else False,
+            count_in_seconds=self.session.count_in_seconds if self.session is not None else 0.0,
             finished=self._events.get("finished"),
             stopped=self._events.get("stopped", False),
             loss=self._events.get("loss"),

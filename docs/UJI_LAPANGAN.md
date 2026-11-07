@@ -28,6 +28,10 @@ Cetak dokumen ini, atau isi langsung di komputer. Setiap uji punya kolom **Hasil
 | Keyboard/piano digital + kabel ke sound card | ☐ |
 | Kabel loopback: dari Output sound card ke Input 1 (untuk kalibrasi & uji sinkron) | ☐ |
 | Lagu uji ± 4 menit yang sudah dikuasai semua suara | ☐ |
+| Charger laptop **tercolok** (jangan memakai baterai saat merekam) | ☐ |
+| Aplikasi pengolah suara Windows **dimatikan** (FxSound, Nahimic, Dolby, dan sejenisnya; tutup dari ikon pojok kanan bawah) | ☐ |
+| **USB selective suspend** dimatikan (Control Panel → Power Options → Edit power plan → Change advanced power settings → USB settings → Disabled) | ☐ |
+| SC202HD dicolok **langsung** ke port USB laptop, bukan lewat hub | ☐ |
 
 **Catatan umum**
 
@@ -53,13 +57,13 @@ Cetak dokumen ini, atau isi langsung di komputer. Setiap uji punya kolom **Hasil
 
 ---
 
-## Uji 2 — Sinkronisasi antar-track (selisih ≤ 1 ms)
+## Uji 2 — Sinkronisasi antar-track (selisih ≤ 3 ms)
 
 *Dikerjakan teknisi lewat terminal, dengan kabel loopback masih terpasang.*
 
 | Langkah | Yang dicatat | Hasil | Lulus / Gagal |
 |---|---|---|---|
-| Jalankan `tools\sync_test.py` (lihat README). Aplikasi merekam 5 track klik lewat kabel loopback. | "Selisih terbesar antar-track" (ms). | ____ ms | Lulus jika **≤ 1 ms** |
+| Jalankan `tools\sync_test.py` (lihat README). Aplikasi merekam 5 track klik lewat kabel loopback. | "Selisih terbesar antar-track" (ms). | ____ ms | Lulus jika **≤ 3 ms** |
 
 ---
 
@@ -70,6 +74,7 @@ Cetak dokumen ini, atau isi langsung di komputer. Setiap uji punya kolom **Hasil
 | Langkah | Yang dicatat | Hasil | Lulus / Gagal |
 |---|---|---|---|
 | Jalankan `tools\stress_test.py --minutes 60` (sound card SC202HD, buffer 256). | "TOTAL DROPOUT". | ____ | Lulus jika **0** |
+| Dengan kabel loopback terpasang (phantom dan direct monitor mati), jalankan `tools\stress_test.py --minutes 60 --loopback`. | "LOMPATAN" dan menit kejadiannya. Lompatan adalah pergeseran waktu yang tidak terhitung sebagai dropout; penyanyi bisa mendengar klik kecil. | ____ | Catat saja (temuan SC202HD) |
 | Perhatikan apakah laptop melambat atau kipas sangat bising. | Catatan bebas. | | — |
 
 ---

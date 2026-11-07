@@ -2,7 +2,8 @@
 
 Nov 6, 2026 · Dimas Arturoh
 
-> Salinan Markdown dari `docs/PRD HarmoniSATB Studio v1.1.pdf`. Jika ada perbedaan, PDF adalah acuan asli.
+> Salinan Markdown dari `docs/PRD HarmoniSATB Studio v1.1.pdf`. Jika ada perbedaan, PDF adalah acuan asli,
+> kecuali perubahan yang tercatat di tabel riwayat versi di akhir dokumen (keputusan setelah PDF dibuat).
 
 ## Perubahan dari v1.0
 
@@ -164,7 +165,7 @@ Semua target di bawah ini terukur dan diuji pada perangkat kelas Intel Core i5 d
 | Waktu proses | ≤ 60 detik untuk lagu 4 menit (5 track) | Benchmark otomatis dengan file uji standar |
 | Stabilitas audio | 0 dropout selama 60 menit pada buffer 256 sampel | Stress test rekam + putar |
 | Keamanan rekaman | Data ditulis ke disk terus-menerus selama merekam; maksimal 1 detik hilang jika listrik padam | Uji cabut daya/USB saat merekam |
-| Sinkronisasi | Selisih antar-track ≤ 1 ms setelah kalibrasi | Rekam klik loopback, ukur selisih |
+| Sinkronisasi | Selisih antar-track ≤ 3 ms setelah kalibrasi | Rekam klik loopback, ukur selisih |
 | Kemudahan pakai | Tombol rekam ≥ 64×64 px, tema gelap kontras tinggi, terbaca dari jarak 1,5 m | Uji pengguna dengan anggota paduan suara |
 | Instalasi | Satu installer .exe, tanpa instal Python terpisah, ukuran ≤ 1,5 GB | Instal di Windows 10 & 11 bersih |
 | Offline | Seluruh fitur berjalan tanpa internet | Uji dengan jaringan dimatikan |
@@ -207,7 +208,7 @@ Pengembangan berlangsung 10 minggu dalam 5 sprint; tiap sprint punya gerbang uji
 | Sprint | Minggu | Cakupan | Gerbang lulus |
 |---|---|---|---|
 | 0 | 1 | Cek SC202HD (checklist Bagian 2), uji `sounddevice` + driver, kalibrasi latensi | Rekam-putar 48 kHz stabil 10 menit, latensi terukur |
-| 1 | 2–3 | Engine audio via baris perintah: rekam 5 track, playback cue, metronom, kompensasi latensi, proyek & take | 5 track sejajar ≤ 1 ms, 0 dropout 60 menit |
+| 1 | 2–3 | Engine audio via baris perintah: rekam 5 track, playback cue, metronom, kompensasi latensi, proyek & take | 5 track sejajar ≤ 3 ms, 0 dropout 60 menit |
 | 2 | 4–5 | Engine pascaproduksi: FR-5 s.d. FR-8, laporan, uji DeepFilterNet pada rekaman nyata | Master memenuhi TP/LUFS, ≤ 60 detik |
 | 3 | 6–8 | Antarmuka PySide6: 5 bilah, VU meter, slider, daftar take, preset ruang, A/B | Alur kerja Bagian 3 bisa dijalankan penuh lewat UI |
 | 4 | 9–10 | Uji lapangan dengan paduan suara, perbaikan bug, installer .exe | Lulus seluruh kriteria Bagian 10 |
@@ -239,7 +240,7 @@ Versi 1.1 dinyatakan siap rilis jika seluruh kriteria berikut lulus.
 |---|---|---|
 | Standar YouTube | True Peak ≤ −1,0 dBTP pada 100% file uji; LUFS −14 ±1, atau lebih pelan dengan peringatan di laporan | FFmpeg `ebur128` sebagai pembanding independen |
 | Stabilitas audio | 0 dropout selama 60 menit pada buffer 256 | Stress test |
-| Sinkronisasi | Selisih antar-track ≤ 1 ms | Uji loopback klik |
+| Sinkronisasi | Selisih antar-track ≤ 3 ms | Uji loopback klik |
 | Kualitas vokal | Tidak ada artefak denoise yang jelas terdengar dan tidak ada comb-filtering akibat pemrosesan | Uji dengar oleh 2 orang + spektrogram |
 | Kecepatan | Proses lagu 4 menit ≤ 60 detik di Core i5 | Benchmark |
 | Ekspor | WAV 24-bit/48 kHz dan MP3 320 kbps valid, ekor reverb utuh, tidak ada file yang tertimpa | Validasi header + uji dengar akhir lagu |
@@ -257,5 +258,6 @@ Fitur berikut sengaja tidak dikerjakan di v1.1 dan bisa dipertimbangkan untuk ve
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 1.1 rev. 1 | 07-11-2026 | Target sinkronisasi antar-track diubah dari ≤ 1 ms menjadi ≤ 3 ms (keputusan pemilik proyek). Uji SC202HD: driver USB generik (chip Realtek, tanpa ASIO) menggeser latensi 1–3 ms setiap stream dibuka dan tidak bisa dikoreksi otomatis. Selisih 3 ms setara jarak sekitar 1 m antar-penyanyi: tidak terdengar sebagai gema karena setiap suara dinyanyikan orang berbeda. Ditambah pemanasan sound card 5 detik sebelum hitungan awal |
 | 1.1 | 06-11-2026 | Disesuaikan ke SPL Audio SC202HD; pitch correction dihapus; monitoring via direct monitor fisik; auto-balance + slider; prioritas mastering TP > LUFS > LRA; manajemen proyek; jadwal 10 minggu |
 | 1.0 | 06-11-2026 | Draf awal |

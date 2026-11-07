@@ -29,7 +29,7 @@ from chorale.audio.calibration import load_calibrations  # noqa: E402
 from chorale.audio.device import BLOCKSIZE_CHOICES, DEFAULT_BLOCKSIZE, AudioDeviceError, select_device  # noqa: E402
 from chorale.audio.meter import meter_zone  # noqa: E402
 from chorale.audio.metronome import DEFAULT_VOLUME_DB  # noqa: E402
-from chorale.audio.session import AudioSession  # noqa: E402
+from chorale.audio.session import WARMUP_SECONDS, AudioSession  # noqa: E402
 from chorale.project import TRACK_IDS, TRACK_LABELS, add_recent, create_project, list_recent, open_project  # noqa: E402
 from chorale.project.model import COUNT_IN_CHOICES, TIME_SIGNATURES  # noqa: E402
 
@@ -202,7 +202,7 @@ def cmd_rekam(args) -> int:
             project, selection, record_track=args.track, blocksize=args.buffer,
             input_first_channel=first, record_channels=channels,
             monitor_gain_db=args.volume_musik, metronome=False if args.tanpa_metronom else None,
-            metronome_volume_db=args.volume_metronom,
+            metronome_volume_db=args.volume_metronom, warmup_seconds=WARMUP_SECONDS,
         )
     except ValueError as exc:
         print(f"  {exc}")

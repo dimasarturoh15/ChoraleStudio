@@ -564,3 +564,22 @@ SC202HD akhirnya tersambung. Chip di dalamnya **Realtek** (USB `VID_0BDA&PID_4E1
 **Diperbaiki:** `tools/sync_test.py` kini menolak take yang puncaknya di bawah -50 dBFS atau keyakinannya di bawah 1000. Sebelumnya, take berisi derau (gain loopback terlalu kecil) lolos dan menghasilkan angka selisih yang tidak bermakna (9 ms pada uji pertama).
 
 **Status:** kriteria Sinkronisasi (≤ 1 ms) belum terpenuhi karena batasan driver SC202HD. Keputusan arah ada di pengguna (lihat laporan 07-11-2026). Stress test 60 menit di SC202HD dan rekaman suara asli belum dijalankan.
+
+### Keputusan pengguna: pilihan 1 (tetap SC202HD, target ≤ 3 ms, pengaman di aplikasi)
+
+**Dikerjakan**
+- PRD v1.1 rev. 1: target sinkronisasi ≤ 1 ms → **≤ 3 ms**, beserta alasannya (tabel riwayat versi). Disesuaikan juga di CLI.md, UJI_LAPANGAN.md, README, `sync_test.py` (batas 144 sampel), dan ambang "Cukup" kalibrasi (`ACCEPTABLE_SPREAD` 144 sampel).
+- **Pemanasan sound card**: `AudioSession(warmup_seconds=...)`; layar rekam, CLI, dan `sync_test.py` memakai `WARMUP_SECONDS = 5`. Selama pemanasan output hening, tidak ada yang direkam, dan layar menampilkan "Menyiapkan sound card …". Bawaan untuk pemutaran: tanpa pemanasan.
+- `stress_test.py --loopback`: metronom 60 BPM sepanjang uji, rekaman dianalisis tiap 10 detik (`analyze_loopback`, `find_jumps`), sehingga lompatan latensi diam-diam ikut membuat uji gagal.
+- Panduan pengguna dan checklist uji lapangan: charger tercolok, aplikasi pengolah suara dimatikan, USB selective suspend dimatikan, sound card langsung ke port USB.
+- Tes baru `tests/test_warmup_loopback.py` (5 tes). Analisis loopback awalnya salah membaca jeda 1 detik karena klik periodik; jendela kini satu klik dengan pencarian jeda maksimal 300 ms. **246 tes lulus.**
+
+**Hasil uji ulang di SC202HD (charger, tanpa FxSound, USB suspend mati)**
+
+| Uji | Hasil |
+|---|---|
+| Kalibrasi | 1008 sampel (median), percobaan [1521, 1008, 960, 1118, 910]: tidak konsisten |
+| `sync_test.py` putaran 1 (pemanasan 5 s) | 5,80 ms → **tidak lulus** |
+| `sync_test.py` putaran 2 (pemanasan 5 s) | 2,26 ms → lulus |
+
+**Kesimpulan jujur:** target ≤ 3 ms **belum terpenuhi secara andal**. Pemanasan hanya mengatasi lompatan di detik-detik awal *di dalam* satu rekaman; pergeseran latensi *antar*-rekaman (sampai sekitar 6 ms) tidak bisa diketahui aplikasi tanpa acuan. Usulan perbaikan berikutnya (kanal acuan loopback di Input 2) menunggu keputusan pengguna karena butuh kabel tambahan saat merekam.

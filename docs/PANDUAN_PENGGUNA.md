@@ -20,6 +20,13 @@ Tidak perlu memasang program lain dan tidak perlu internet.
 
 ## 2. Pertama kali: atur sound card
 
+**Setiap kali akan merekam, siapkan laptop dulu.** Sound card USB seperti SC202HD mudah terganggu oleh pengaturan hemat daya Windows:
+
+1. **Colokkan charger laptop.** Jangan merekam memakai baterai.
+2. **Matikan aplikasi pengolah suara** seperti FxSound, Nahimic, atau Dolby: klik kanan ikonnya di pojok kanan bawah, lalu pilih **Exit/Keluar**.
+3. **Matikan USB selective suspend** (cukup sekali): Control Panel → **Power Options** → **Edit power plan** → **Change advanced power settings** → **USB settings** → **USB selective suspend setting** → ubah **On battery** dan **Plugged in** menjadi **Disabled**.
+4. Colokkan sound card **langsung** ke port USB laptop, bukan lewat hub.
+
 Colok sound card (SPL Audio SC202HD) ke laptop, lalu buka **Pengaturan** (pojok kanan atas).
 
 ![Pengaturan Perangkat Audio](screenshots/04_pengaturan_perangkat_audio.png)
@@ -31,7 +38,7 @@ Colok sound card (SPL Audio SC202HD) ke laptop, lalu buka **Pengaturan** (pojok 
 - **Kalibrasi Latensi** (cukup sekali):
   1. Kecilkan volume headphone dan **matikan tombol +48V**.
   2. Sambungkan kabel dari **Output** ke **Input 1** sound card.
-  3. Tekan **Mulai Kalibrasi** dan tunggu sampai muncul tulisan **Akurat**.
+  3. Tekan **Mulai Kalibrasi** dan tunggu hasilnya: **Akurat** atau **Cukup** berarti baik. Jika muncul **Tidak konsisten**, ulangi sekali lagi.
   4. Lepas kabel, lalu tekan **Simpan**.
 
 Kalibrasi membuat semua suara yang direkam terpisah tetap jatuh tepat di ketukan yang sama.
@@ -56,7 +63,7 @@ Proyek disimpan di **Documents\HarmoniSATB\\<judul lagu>**. Semua perubahan ters
 
 1. Atur volume keyboard di 70–80%, lalu putar kenop gain di sound card sampai meter kebanyakan **hijau**, sesekali **kuning**.
 2. Tekan **tombol bulat** di baris **Piano/Orgen** (atau tekan tombol **R** di keyboard).
-3. Ikuti hitungan awal metronom, lalu mainkan lagunya.
+3. Tunggu sebentar: selama sekitar 5 detik bar bertuliskan **"Menyiapkan sound card …"** dan belum ada bunyi. Setelah itu ikuti hitungan awal metronom, lalu mainkan lagunya.
 4. Tekan **Stop** (atau **Spasi**) jika sudah selesai.
 
 ![Sedang merekam](screenshots/10_merekam.png)

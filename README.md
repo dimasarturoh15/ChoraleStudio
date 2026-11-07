@@ -223,7 +223,7 @@ Semua alat dijalankan dengan `.venv\Scripts\python tools\<nama>.py`. Referensi l
 | `list_devices.py` | Daftar host API dan perangkat audio, menandai SC202HD dan dukungan ASIO |
 | `test_wasapi.py` | Membuka sound card di WASAPI Exclusive (lalu Shared), 48 kHz, buffer 256 |
 | `calibrate_latency.py` | Mengukur latensi rekam-putar dengan kabel loopback |
-| `sync_test.py` | Uji selisih antar-track lewat loopback (target ≤ 1 ms) |
+| `sync_test.py` | Uji selisih antar-track lewat loopback (target ≤ 3 ms) |
 | `stress_test.py` | Rekam dan putar selama N menit, menghitung dropout |
 | `cli_session.py` | Membuat proyek, merekam, memutar, dan memilih take tanpa antarmuka |
 | `import_takes.py` | Mengimpor WAV/FLAC sebagai take |
@@ -280,7 +280,7 @@ Versi **1.1.0** lengkap secara fitur dan siap uji lapangan. Ringkasan kriteria p
 | Keamanan rekaman | ≤ 1 detik hilang bila listrik padam | ✅ Lulus (simulasi) |
 | Instalasi | Satu Setup.exe tanpa Python, ≤ 1,5 GB | ✅ Lulus (87 MB) |
 | Offline | Semua fitur tanpa internet | ✅ Lulus (desain) |
-| Sinkronisasi | Selisih antar-track ≤ 1 ms | ⏳ Butuh SC202HD dan kabel loopback |
+| Sinkronisasi | Selisih antar-track ≤ 3 ms | ⚠️ Tidak konsisten di SC202HD: 1,3 sampai 5,8 ms antar-sesi (lihat PROGRESS) |
 | Kualitas vokal | Tanpa artefak denoise dan comb-filtering | ⏳ Butuh rekaman nyanyian asli |
 | Kegunaan | Anggota baru menyelesaikan satu lagu | ⏳ Uji lapangan |
 

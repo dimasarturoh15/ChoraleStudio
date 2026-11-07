@@ -58,7 +58,7 @@ Mengukur latensi round-trip (putar ke rekam) dan menyimpannya ke `%APPDATA%\Harm
 
 ### `sync_test.py`
 
-Merekam klik metronom lewat loopback ke lima track lalu mengukur selisih antar-track. Lulus bila selisih ≤ 1 ms.
+Merekam klik metronom lewat loopback ke lima track lalu mengukur selisih antar-track. Lulus bila selisih ≤ 3 ms (PRD v1.1 rev. 1). Setiap track diawali pemanasan 5 detik seperti di aplikasi.
 
 | Opsi | Keterangan |
 |---|---|
@@ -81,9 +81,11 @@ Merekam dan memutar bersamaan selama N menit, lalu menghitung dropout, sampel ya
 | `--minutes N` | Durasi uji (default 10; kriteria PRD 60) |
 | `--interval DETIK` | Jeda laporan kemajuan |
 | `--simpan` | Jangan hapus proyek uji di akhir |
+| `--loopback` | Dengan kabel loopback: metronom 60 BPM berbunyi sepanjang uji, lalu rekaman dianalisis tiap 10 detik untuk menemukan **lompatan latensi** yang tidak dilaporkan sebagai dropout (ditemukan pada SC202HD). Gagal bila ada lompatan lebih dari 0,5 ms |
 
 ```powershell
 .venv\Scripts\python tools\stress_test.py --minutes 60 --blocksize 256
+.venv\Scripts\python tools\stress_test.py --minutes 60 --loopback
 ```
 
 ## Sesi rekam tanpa antarmuka

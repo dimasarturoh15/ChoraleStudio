@@ -135,7 +135,7 @@ def find_calibration(input_device: str, output_device: str, hostapi: str, exclus
 
 MIN_QUALITY = 20.0
 ACCURATE_SPREAD = 1      # sampel: "Akurat"
-ACCEPTABLE_SPREAD = 48   # sampel (1 ms): masih memenuhi PRD
+ACCEPTABLE_SPREAD = 144  # sampel (3 ms): masih memenuhi PRD v1.1 rev. 1
 
 SAFETY_STEPS = (
     "Kecilkan volume headphone ke nol atau lepas headphone dari kepala.",
