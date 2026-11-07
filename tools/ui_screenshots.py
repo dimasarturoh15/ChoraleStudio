@@ -25,6 +25,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT))
 
 from chorale.audio import device  # noqa: E402,F401
+from chorale.audio.session import WARMUP_SECONDS  # noqa: E402
 from chorale.project import Take, add_recent, create_project  # noqa: E402
 
 SAMPLES = [  # judul, tempo, birama, track terekam, waktu diubah (seperti mockup)
@@ -231,7 +232,16 @@ def recording_shots(app, w, shot, projects_dir: Path) -> None:
             raise RuntimeError("Kondisi tidak tercapai saat membuat screenshot")
 
     ctrl = lambda: w.recording.controller  # noqa: E731
-    w.recording.record("alto")
+
+    def record_skipping_gain_check(track_id: str) -> None:
+        """Rekam tanpa berhenti di panduan cek gain (muncul untuk kelompok suara yang belum punya take)."""
+        w.recording.record(track_id)
+        if w.recording.guide.isVisible():
+            while w.recording.guide.isVisible():
+                w.recording.guide.next()
+                app.processEvents()
+
+    record_skipping_gain_check("alto")
     wait_for(lambda: ctrl().mode == "recording" and ctrl().session.song_seconds > -1.7)
     shot("10_merekam")
     w.recording.stop()
@@ -253,8 +263,9 @@ def recording_shots(app, w, shot, projects_dir: Path) -> None:
     w.recording.timer.start()
 
     w.recording.project.vocal_guide_done = True
-    die_after["n"] = 1250  # ±6,7 s: lewat hitungan awal 3,3 s, lalu "dicabut" saat merekam
-    w.recording.record("alto")
+    # Pemanasan 5 s + hitungan awal 3,3 s, lalu "dicabut" sekitar 3 s setelah rekaman dimulai.
+    die_after["n"] = 1250 + int(WARMUP_SECONDS * 48000 / 256)
+    record_skipping_gain_check("alto")
     wait_for(lambda: w.recording.error_overlay.isVisible() and ctrl().mode == "idle")
     shot("12_sound_card_terputus")
     w.recording.error_overlay.close_overlay()

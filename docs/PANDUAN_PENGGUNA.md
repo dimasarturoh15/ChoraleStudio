@@ -85,6 +85,8 @@ Sebelum merekam suara pertama, aplikasi menampilkan **Persiapan Rekam Vokal**:
 
 Lalu rekam **Bass → Tenor → Alto → Sopran** (urutan boleh berbeda). Rekaman vokal berhenti otomatis 2 detik setelah piano selesai.
 
+**Setiap kelompok suara baru** (misalnya saat pertama kali merekam Tenor setelah Bass), layar Persiapan Rekam Vokal muncul lagi **langsung di langkah Atur Gain Mic**, karena keras suara tiap kelompok berbeda. Minta kelompok itu menyanyikan bagian paling keras, putar gain sampai **"Level sudah pas"**, tekan **Lanjut**, lalu **Mulai Rekam**. Saat merekam ulang suara yang sama, langkah ini dilewati karena gain-nya sudah diatur. Tekan **Batal** jika belum siap merekam.
+
 ---
 
 ## 6. Memilih take terbaik

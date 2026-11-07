@@ -229,10 +229,39 @@ def test_record_piano_then_vocal_with_guide(qapp, tmp_path):
     assert wait_until(qapp, lambda: project.tracks["bass"].has_audio and screen.controller.mode == IDLE)
 
     screen.record("tenor")
-    assert not screen.guide.isVisible(), "wizard hanya sekali per proyek"
+    assert screen.guide.isVisible(), "kelompok suara baru: gain dicek lagi"
+    assert screen.guide.step == 1, "langsung di langkah Atur Gain Mic, panduan penuh hanya sekali per proyek"
+    assert screen.guide.back_btn.text() == "Batal"
+    screen.guide.next()
+    screen.guide.next()
+    assert wait_until(qapp, lambda: screen.controller.mode == RECORDING)
+    time.sleep(0.2)
+    screen.stop()
+    assert wait_until(qapp, lambda: project.tracks["tenor"].has_audio and screen.controller.mode == IDLE)
+
+    screen.record("tenor")
+    assert not screen.guide.isVisible(), "rekam ulang suara yang sama: gain sudah diatur"
     assert wait_until(qapp, lambda: screen.controller.mode == RECORDING)
     screen.stop()
     assert wait_until(qapp, lambda: screen.controller.mode == IDLE)
+    screen.shutdown()
+
+
+def test_gain_check_can_be_cancelled(qapp, tmp_path):
+    project = _project(tmp_path)
+    screen = _screen(qapp, project)
+    screen.record("piano")
+    assert wait_until(qapp, lambda: screen.controller.mode == RECORDING)
+    time.sleep(0.2)
+    screen.stop()
+    assert wait_until(qapp, lambda: project.tracks["piano"].has_audio and screen.controller.mode == IDLE)
+    project.update_settings(vocal_guide_done=True)
+
+    screen.record("alto")
+    assert screen.guide.isVisible() and screen.guide.step == 1
+    screen.guide.back()  # Batal
+    assert wait_until(qapp, lambda: not screen.guide.isVisible())
+    assert screen.controller.mode == IDLE and not project.tracks["alto"].takes
     screen.shutdown()
 
 

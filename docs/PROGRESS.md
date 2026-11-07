@@ -615,3 +615,10 @@ Mode `--acuan-satu-kabel`: take vokal (loopback playback) sekaligus menjadi acua
 - `tools/build_installer.py`: laporan berkas installer kini memakai nama sesuai versi (sebelumnya bisa menyebut Setup.exe versi lama di folder yang sama).
 - Tes baru `test_calibration_badge_for_varying_latency`; **256 tes lulus**.
 - `HarmoniSATB-Studio-1.2.0-Setup.exe` (87 MB) dibangun, aplikasi hasil build lulus uji tanpa Python di PATH (buka/tutup, `--uji-mandiri` −14,04 LUFS), lalu **dipasang menimpa 1.1.0** di laptop ini (`/VERYSILENT /CURRENTUSER`) dan diuji lagi dari folder instalasi: lulus.
+
+### Cek gain per kelompok suara (08-11-2026, disetujui pengguna)
+
+- Persiapan Rekam Vokal kini punya `start_step`: suara vokal pertama tetap mendapat panduan penuh (sekali per proyek); kelompok suara vokal berikutnya yang belum punya take membuka panduan langsung di "Atur Gain Mic" (tombol kiri = Batal); rekam ulang suara yang sudah punya take tidak ditanya.
+- Alasan: volume tiap kelompok berbeda dan operator baru mudah lupa mengecek gain setelah kelompok pertama.
+- Tes diperbarui (`test_record_piano_then_vocal_with_guide`) dan ditambah (`test_gain_check_can_be_cancelled`).
+- **Diperbaiki:** `tools/ui_screenshots.py` belum memperhitungkan pemanasan 5 detik, sehingga screenshot 12 yang ter-commit di rilis 1.2.0 menampilkan "sampai detik 00:00". Kini kembali 00:03; skrip juga melewati cek gain.

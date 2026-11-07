@@ -28,6 +28,7 @@ from chorale.ui.widgets import SegmentedControl, TopBar, button, hbox, label, re
 FPS = 30
 MSG_NEED_ALL = "Rekam kelima track terlebih dahulu"
 MSG_WARMING_UP = "Menyiapkan sound card …"
+GUIDE_FULL, GUIDE_GAIN_STEP = 0, 1  # langkah awal Persiapan Rekam Vokal
 
 
 def fmt_clock(seconds: float) -> str:
@@ -391,13 +392,21 @@ class RecordingScreen(QWidget):
             self.toast.show_message(reason)
             return
         self.select_track(track_id)
-        first_vocal = not any(self.project.tracks[t].takes for t in VOCAL_TRACK_IDS)
-        if track_id in VOCAL_TRACK_IDS and first_vocal and not self.project.vocal_guide_done:
-            self._guide_track = track_id
-            ref = self.controller.reference_channel_for(track_id)
-            self.guide.open_for(input_text(track_id, self.settings).replace("Mic", "Mono"),
-                                reference_input=None if ref is None else ref + 1)
-            return
+        if track_id in VOCAL_TRACK_IDS:
+            first_vocal = not any(self.project.tracks[t].takes for t in VOCAL_TRACK_IDS)
+            if first_vocal and not self.project.vocal_guide_done:
+                start = GUIDE_FULL
+            elif not self.project.tracks[track_id].takes:
+                # Kelompok suara baru: volume tiap kelompok berbeda, jadi gain dicek lagi.
+                start = GUIDE_GAIN_STEP
+            else:
+                start = None  # rekam ulang suara yang sama: gain sudah diatur
+            if start is not None:
+                self._guide_track = track_id
+                ref = self.controller.reference_channel_for(track_id)
+                self.guide.open_for(input_text(track_id, self.settings).replace("Mic", "Mono"),
+                                    reference_input=None if ref is None else ref + 1, start_step=start)
+                return
         self._start_recording(track_id)
 
     def _start_recording(self, track_id: str) -> None:

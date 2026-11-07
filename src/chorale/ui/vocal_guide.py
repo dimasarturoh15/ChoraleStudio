@@ -207,6 +207,7 @@ class VocalGuideOverlay(ModalOverlay):
     def __init__(self, parent: QWidget):
         super().__init__(parent, 1240)
         self.step = 0
+        self._first_step = 0
         self._history: deque[tuple[float, float]] = deque()
 
         close = button("", "icon", "close", COLORS["text2"], 22)
@@ -307,9 +308,14 @@ class VocalGuideOverlay(ModalOverlay):
         lay.addLayout(hbox(self.back_btn, None, self.next_btn))
         self._show_step()
 
-    def open_for(self, input_text: str, reference_input: int | None = None) -> None:
-        """reference_input: nomor input kanal acuan (1/2) jika fitur aktif."""
-        self.step = 0
+    def open_for(self, input_text: str, reference_input: int | None = None, start_step: int = 0) -> None:
+        """reference_input: nomor input kanal acuan (1/2) jika fitur aktif.
+
+        start_step: 1 = mulai langsung di "Atur Gain Mic" (cek gain kelompok suara berikutnya);
+        langkah sebelumnya tidak ditampilkan dan tombol kiri menjadi Batal.
+        """
+        self._first_step = start_step
+        self.step = start_step
         self.input_hint.setText(input_text)
         self.reference_hint.setVisible(reference_input is not None)
         if reference_input is not None:
@@ -322,14 +328,14 @@ class VocalGuideOverlay(ModalOverlay):
         self.indicator.set_step(self.step)
         self.items_stack.setCurrentIndex(self.step)
         self.right_stack.setCurrentIndex(self.step)
-        self.back_btn.setText("Batal" if self.step == 0 else "Kembali")
+        self.back_btn.setText("Batal" if self.step == self._first_step else "Kembali")
         last = self.step == len(STEP_TITLES) - 1
         self.next_btn.setText("Mulai Rekam" if last else "Lanjut")
         self.next_btn.setIcon(icons.icon("mic" if last else "chevron_right", "#FFFFFF", 20))
         self.recenter()
 
     def back(self) -> None:
-        if self.step == 0:
+        if self.step == self._first_step:
             self.close_overlay()
         else:
             self.step -= 1

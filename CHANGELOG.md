@@ -4,6 +4,14 @@ Semua perubahan penting pada HarmoniSATB Studio dicatat di berkas ini. Formatnya
 
 ## [Belum dirilis]
 
+### Ditambahkan
+
+- Cek gain untuk setiap kelompok suara: saat pertama kali merekam suara vokal berikutnya, Persiapan Rekam Vokal terbuka langsung di langkah "Atur Gain Mic". Rekam ulang suara yang sama tidak ditanya lagi.
+
+### Diperbaiki
+
+- `tools/ui_screenshots.py` memperhitungkan pemanasan sound card dan cek gain; screenshot "Sound card terputus" kembali menampilkan detik rekaman yang benar (sebelumnya 00:00).
+
 ## [1.2.0] - 2026-11-07
 
 Penyesuaian setelah uji dengan SPL Audio SC202HD.
