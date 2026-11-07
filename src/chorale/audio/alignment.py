@@ -35,7 +35,9 @@ HOP = SAMPLE_RATE // 2         # jarak antar-jendela (0,5 detik)
 MAX_SHIFT = SAMPLE_RATE // 10
 MIN_CORRELATION = 0.5          # korelasi ternormalisasi minimum agar jendela dipercaya
 MIN_RMS = 10 ** (-60 / 20)     # jendela acuan yang lebih pelan dari -60 dBFS dilewati
-JUMP_TOLERANCE = 8             # sampel; perubahan lebih kecil dianggap derau pengukuran
+# Perubahan lebih kecil dianggap derau pengukuran. Di SC202HD, klik bernada berbeda terukur
+# selisih 11 sampel (tunda DAC/kabel/ADC bergantung frekuensi); lompatan driver nyata >= 65 sampel.
+JUMP_TOLERANCE = 24            # sampel (0,5 ms)
 FADE = 48                      # sampel (1 ms) fade di sambungan antar-segmen
 
 

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import os
 import shutil
 import sys
 import tempfile
@@ -64,6 +65,40 @@ def record(project, selection, track, seconds, blocksize, metronome, reference_c
     return session, take
 
 
+def self_reference_align(project, session, take):
+    """Satu kabel: take vokal adalah loopback playback, jadi dipakai juga sebagai kanal acuannya.
+
+    Menguji pengukuran dan penggeseran per take dengan sinyal hardware asli; yang tidak
+    teruji hanya keserempakan dua input (satu chip, satu clock).
+    """
+    from chorale.audio.alignment import align_take
+    from chorale.audio.session import ALIGN_REFERENCE
+
+    path = project.take_path(take)
+    ref = path.with_name(path.stem + "_acuan_uji.wav")
+    shutil.copyfile(path, ref)
+    try:
+        info = sf.info(str(path))
+        if os.environ.get("SYNC_DEBUG"):
+            from chorale.audio.alignment import measure_offsets
+            pts = measure_offsets(sf.read(str(ref), dtype="float32", always_2d=True)[0][:, 0],
+                                  session.played_reference(info.frames + SR))
+            print()
+            print("    e per jendela:", [e for _, e in pts])
+        result = align_take(path, ref, session.played_reference(info.frames + SR))
+    finally:
+        ref.unlink(missing_ok=True)
+    if result is None:
+        print(" (acuan tidak terdeteksi)", end="")
+        return take
+    print(f" (geser {result.offset:+d} sampel, {result.jumps} lompatan)", end="")
+    take.alignment = ALIGN_REFERENCE
+    take.duration = round(result.frames / SR, 3)
+    take.latency_compensation += result.offset
+    project.save()
+    return take
+
+
 def main() -> int:
     setup_console()
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -74,6 +109,9 @@ def main() -> int:
     parser.add_argument("--simpan", action="store_true", help="simpan proyek uji (default dihapus)")
     parser.add_argument("--acuan", action="store_true",
                         help="uji kanal acuan: kabel kedua Output R -> Input 2 untuk track vokal")
+    parser.add_argument("--acuan-satu-kabel", action="store_true",
+                        help="uji pengukuran kanal acuan dengan satu kabel: take vokal (loopback) sekaligus "
+                             "menjadi acuannya sendiri")
     args = parser.parse_args()
 
     try:
@@ -113,7 +151,10 @@ def main() -> int:
             if take is None:
                 print(" GAGAL (tidak ada audio)")
                 return 1
-            note = f", disejajarkan: {take.alignment}" if args.acuan and not is_piano else ""
+            if args.acuan_satu_kabel and not is_piano:
+                take = self_reference_align(project, session, take)
+            note = (f", disejajarkan: {take.alignment}" if (args.acuan or args.acuan_satu_kabel) and not is_piano
+                    else "")
             print(f" {take.duration:.1f} s, dropout {session.dropouts}{note}")
             for w in session.warnings:
                 if "lebih pendek dari 90%" not in w:

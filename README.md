@@ -276,11 +276,11 @@ Versi **1.1.0** lengkap secara fitur dan siap uji lapangan. Ringkasan kriteria p
 | Standar YouTube | True Peak ≤ -1,0 dBTP pada 100% berkas uji | ✅ Lulus |
 | Kecepatan | Lagu 4 menit, 5 track ≤ 60 detik | ✅ Lulus (34,4 detik) |
 | Ekspor | WAV 24/48 dan MP3 320 valid, ekor utuh, tidak menimpa | ✅ Lulus |
-| Stabilitas audio | 0 dropout selama 60 menit pada buffer 256 | ✅ Lulus di Realtek · ⏳ SC202HD |
+| Stabilitas audio | 0 dropout selama 60 menit pada buffer 256 | ✅ 0 dropout di Realtek dan SC202HD · ⚠️ SC202HD: 51 lompatan latensi diam-diam per jam (ditangani kanal acuan) |
 | Keamanan rekaman | ≤ 1 detik hilang bila listrik padam | ✅ Lulus (simulasi) |
 | Instalasi | Satu Setup.exe tanpa Python, ≤ 1,5 GB | ✅ Lulus (87 MB) |
 | Offline | Semua fitur tanpa internet | ✅ Lulus (desain) |
-| Sinkronisasi | Selisih antar-track ≤ 3 ms | ⚠️ Tidak konsisten di SC202HD: 1,3 sampai 5,8 ms antar-sesi (lihat PROGRESS) |
+| Sinkronisasi | Selisih antar-track ≤ 3 ms | ✅ Dengan kanal acuan: 0,43–0,73 ms di SC202HD (uji satu kabel) · ⏳ uji dua kabel. Tanpa kanal acuan: 0,09–5,8 ms |
 | Kualitas vokal | Tanpa artefak denoise dan comb-filtering | ⏳ Butuh rekaman nyanyian asli |
 | Kegunaan | Anggota baru menyelesaikan satu lagu | ⏳ Uji lapangan |
 

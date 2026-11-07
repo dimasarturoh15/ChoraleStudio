@@ -594,4 +594,14 @@ SC202HD akhirnya tersambung. Chip di dalamnya **Realtek** (USB `VID_0BDA&PID_4E1
 - Dokumen: PRD v1.1 rev. 2, ARCHITECTURE (bagian kanal acuan dan pemanasan), PANDUAN_PENGGUNA, UJI_LAPANGAN, CLI, CHANGELOG.
 - Tes baru `tests/test_alignment.py` (8 tes: pergeseran dan lompatan, penyusunan ulang, offset negatif, acuan hening, penulisan atomik, sesi end-to-end dengan stream palsu, fallback, validasi kanal). **254 tes lulus.**
 
-**Belum:** uji hardware `sync_test.py --acuan` di SC202HD (menunggu stress test 60 menit selesai dan kabel kedua dipasang).
+**Uji hardware SC202HD (07-11-2026 malam)**
+
+| Uji | Hasil |
+|---|---|
+| `stress_test.py --minutes 60 --loopback` | **0 dropout**, 0 sampel hilang, beban callback rata-rata 6,9% (maks 100,4% sekali). **51 lompatan latensi diam-diam** (naik dan turun 1,3–11 ms, sekitar 1 per menit), rentang 900–1509 sampel. File 0,72 s lebih pendek dari jam PC (selisih clock sekitar 200 ppm) |
+| `sync_test.py` (kalibrasi saja) | 0,09 ms (putaran ini kebetulan semua stream mulai dengan latensi sama; sebelumnya 1,3–5,8 ms) |
+| `sync_test.py --acuan-satu-kabel` | **0,43 / 0,55 / 0,73 ms** pada tiga putaran (lulus ≤ 3 ms). Take digeser +29 sampai +487 sampel dari kalibrasi |
+
+Mode `--acuan-satu-kabel`: take vokal (loopback playback) sekaligus menjadi acuannya sendiri; menguji pengukuran dan penggeseran per take dengan sinyal hardware asli. Yang belum teruji di hardware hanya keserempakan Input 1 dan Input 2 (satu chip, satu clock); uji dua kabel (`--acuan`) menunggu kabel kedua.
+
+**Diperbaiki saat uji:** `JUMP_TOLERANCE` penyejajaran 8 → 24 sampel. Di hardware, klik aksen dan klik biasa (nada berbeda) terukur selisih 11 sampel karena tunda DAC/kabel/ADC bergantung frekuensi, sehingga muncul 7 "lompatan" palsu per take 8 detik. Lompatan driver nyata ≥ 65 sampel. Tes regresi ditambahkan.

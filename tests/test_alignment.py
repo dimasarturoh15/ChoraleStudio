@@ -51,6 +51,13 @@ def test_measure_detects_offset_and_mid_take_jump():
     assert abs(segments[1].start - jump) <= 2 * HOP
 
 
+def test_small_alternating_measurement_noise_is_not_a_jump():
+    """Pola nyata dari SC202HD: e bergantian 50/61 karena klik aksen dan biasa berbeda nada."""
+    points = [(i * HOP, e) for i, e in enumerate([50, 61, 61, 50, 50, 61, 61, 50, 50, 61, 61, 50])]
+    segments = build_segments(points)
+    assert len(segments) == 1 and 50 <= segments[0].offset <= 61
+
+
 def test_apply_segments_puts_vocal_back_on_the_grid():
     n = 30 * SR
     vocal, pos = _impulses(n)
