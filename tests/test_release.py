@@ -32,8 +32,8 @@ def fresh_logging(isolated_appdata):
 
 
 def test_version():
-    assert __version__ == "1.1.0"
-    assert 'version = "1.1.0"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "1.2.0"
+    assert 'version = "1.2.0"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_log_file_rotating_in_appdata(fresh_logging, isolated_appdata):
@@ -44,7 +44,7 @@ def test_log_file_rotating_in_appdata(fresh_logging, isolated_appdata):
     logging.getLogger("chorale.test").warning("pesan uji")
     handler.flush()
     text = (folder / "harmonisatb.log").read_text(encoding="utf-8")
-    assert "HarmoniSATB Studio 1.1.0 dimulai" in text and "pesan uji" in text
+    assert "HarmoniSATB Studio 1.2.0 dimulai" in text and "pesan uji" in text
 
 
 def test_unhandled_errors_are_logged_and_shown_friendly(fresh_logging):
@@ -100,3 +100,34 @@ def test_installer_script_keeps_user_data():
     spec = (ROOT / "installer" / "harmonisatb.spec").read_text(encoding="utf-8")
     assert "console=False" in spec and "harmonisatb.ico" in spec
     assert (ROOT / "src" / "chorale" / "ui" / "assets" / "harmonisatb.ico").read_bytes()[:4] == b"\x00\x00\x01\x00"
+
+
+def test_calibration_badge_for_varying_latency():
+    """SC202HD: latensi berubah-ubah tidak ditampilkan sebagai error merah; ada saran atau penjelasan."""
+    from PySide6.QtWidgets import QApplication
+
+    from chorale.audio.calibration import CalibrationResult
+    from chorale.settings import AppSettings
+    from chorale.ui import theme
+    from chorale.ui.settings_screen import HINT_VARIES_ENABLE, HINT_VARIES_HANDLED, AudioDevicePage
+
+    app = QApplication.instance() or QApplication([])
+    theme.apply(app)
+
+    def result(spread):
+        return CalibrationResult("in", "out", "Windows WASAPI", True, 48000, 256, 1008, 21.0,
+                                 [1008, 1008 + spread], spread, 49.3, "2026-11-07T20:33:00")
+
+    page = AudioDevicePage()
+    page.load(AppSettings(sync_reference=True), cards=[])
+    page._show_calibration(result(600))
+    assert page.accuracy_badge.text() == "Berubah-ubah"
+    assert page.calibration_hint.text() == HINT_VARIES_HANDLED and not page.calibration_hint.isHidden()
+
+    page.reference_check.setChecked(False)
+    page._show_calibration(result(600))
+    assert page.accuracy_badge.text() == "Tidak konsisten"
+    assert page.calibration_hint.text() == HINT_VARIES_ENABLE
+
+    page._show_calibration(result(0))
+    assert "Akurat" in page.accuracy_badge.text() and page.calibration_hint.isHidden()

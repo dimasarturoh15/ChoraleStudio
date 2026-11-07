@@ -4,6 +4,10 @@ Semua perubahan penting pada HarmoniSATB Studio dicatat di berkas ini. Formatnya
 
 ## [Belum dirilis]
 
+## [1.2.0] - 2026-11-07
+
+Penyesuaian setelah uji dengan SPL Audio SC202HD.
+
 ### Ditambahkan
 
 - **Kanal acuan sinkronisasi** (Pengaturan > Pemetaan Input): saat merekam vokal, kabel dari Output ke input yang tidak dipakai mikrofon dipakai untuk mengukur latensi sebenarnya setiap take, lalu take disejajarkan dengan piano, termasuk lompatan latensi di tengah lagu. Ditambah pengingat di Persiapan Rekam Vokal.
@@ -14,15 +18,18 @@ Semua perubahan penting pada HarmoniSATB Studio dicatat di berkas ini. Formatnya
 
 - Target sinkronisasi PRD menjadi ≤ 3 ms (PRD v1.1 rev. 1) setelah uji SPL Audio SC202HD.
 - Panduan pengguna: persiapan laptop sebelum merekam (charger, aplikasi pengolah suara dimatikan, USB selective suspend dimatikan).
+- Kalibrasi yang hasilnya berubah-ubah tidak lagi ditampilkan sebagai error merah: "Berubah-ubah" dengan penjelasan bila kanal acuan aktif, atau "Tidak konsisten" (kuning) dengan saran mengaktifkan kanal acuan.
+
+### Diperbaiki
+
+- Teks "Latensi terukur" menempel pada angka latensi saat kolom Pengaturan sempit.
+- Ambang lompatan penyejajaran 8 → 24 sampel agar klik bernada berbeda tidak dibaca sebagai lompatan latensi.
+- `installer/harmonisatb.spec` kini ikut di repositori. Sebelumnya terabaikan oleh aturan `*.spec` di `.gitignore`, sehingga installer tidak bisa dibuat dari hasil clone.
 
 ### Dokumentasi
 
 - README ditulis ulang: fitur, tangkapan layar, kebutuhan sistem, instalasi, status kriteria penerimaan.
 - Dokumen baru: [ARCHITECTURE.md](docs/ARCHITECTURE.md), [CLI.md](docs/CLI.md), [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), templat Issue dan pull request.
-
-### Diperbaiki
-
-- `installer/harmonisatb.spec` kini ikut di repositori. Sebelumnya terabaikan oleh aturan `*.spec` di `.gitignore`, sehingga installer tidak bisa dibuat dari hasil clone.
 
 ## [1.1.0] - 2026-11-06
 
@@ -76,5 +83,6 @@ Rilis pertama yang lengkap secara fitur sesuai [PRD v1.1](docs/PRD_v1.1.md), sia
 - Uji dengan SPL Audio SC202HD (kalibrasi, sinkronisasi, stress test, rekaman nyanyian) belum dilakukan.
 - DeepFilterNet belum dipakai.
 
-[Belum dirilis]: https://github.com/dimasarturoh15/ChoraleStudio/compare/v1.1.0...HEAD
+[Belum dirilis]: https://github.com/dimasarturoh15/ChoraleStudio/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/dimasarturoh15/ChoraleStudio/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/dimasarturoh15/ChoraleStudio/releases/tag/v1.1.0

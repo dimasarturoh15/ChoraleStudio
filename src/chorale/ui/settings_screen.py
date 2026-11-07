@@ -99,6 +99,13 @@ class LockedField(QFrame):
         self.setToolTip("Dikunci agar semua rekaman 48 kHz / 24-bit.")
 
 
+MSG_VARIES_HANDLED = "Berubah-ubah"
+HINT_VARIES_HANDLED = ("Wajar untuk sound card ini: latensinya berubah setiap kali merekam. Kanal acuan aktif "
+                       "menyejajarkan setiap take vokal, jadi hasil rekaman tetap tepat.")
+HINT_VARIES_ENABLE = ("Latensi sound card ini berubah setiap kali merekam, jadi track bisa bergeser beberapa "
+                      "milidetik. Aktifkan Kanal acuan sinkronisasi agar setiap take vokal tetap sejajar.")
+
+
 class AudioDevicePage(QWidget):
     """Isi halaman 'Perangkat Audio'."""
 
@@ -169,10 +176,14 @@ class AudioDevicePage(QWidget):
         self.latency_value.setFont(theme.font(18, QFont.DemiBold, mono=True))
         self.accuracy_badge = label("")
         self.last_calibrated = label("", "hintMono")
+        self.calibration_hint = label("", "hint")
+        self.calibration_hint.setWordWrap(True)
+        self.calibration_hint.hide()
         result_box = card("inset")
         result_box.setLayout(vbox(
-            hbox(label("Latensi terukur", "secondary"), None, self.latency_value, 10, self.accuracy_badge), 8,
-            self.last_calibrated, margins=(16, 12, 16, 12)))
+            hbox(label("Latensi terukur", "secondary"), 12, None, self.latency_value), 8,
+            hbox(self.accuracy_badge, None), 8,
+            self.last_calibrated, 6, self.calibration_hint, margins=(16, 12, 16, 12)))
         self.calibrate_btn = button("Mulai Kalibrasi", "primary", "timer", "#FFFFFF", 20)
         self.calibrate_btn.clicked.connect(self.start_calibration)
         self.calibration_msg = label("", "error")
@@ -207,6 +218,7 @@ class AudioDevicePage(QWidget):
         self.buffer_combo.currentIndexChanged.connect(lambda _i: self._reselect())
         self.vocal_combo.currentIndexChanged.connect(lambda _i: self._update_reference_hint())
         self.reference_check.toggled.connect(lambda _on: self._update_reference_hint())
+        self.reference_check.toggled.connect(lambda _on: self._show_calibration())
         self._meter_timer = QTimer(self)
         self._meter_timer.setInterval(1000 // LEVEL_FPS)
         self._meter_timer.timeout.connect(self._update_meters)
@@ -344,6 +356,7 @@ class AudioDevicePage(QWidget):
             s = self._selection
             result = find_calibration(s.input.name, s.output.name, s.hostapi, s.exclusive,
                                       self.buffer_combo.currentData())
+        self.calibration_hint.hide()
         if result is None:
             self.latency_value.setText("—")
             self.accuracy_badge.setText("Belum dikalibrasi")
@@ -351,9 +364,17 @@ class AudioDevicePage(QWidget):
             self.last_calibrated.setText("Belum pernah dikalibrasi untuk pengaturan ini")
             return
         text, level = accuracy_label(result)
-        color = {"baik": COLORS["green"], "cukup": COLORS["yellow"], "buruk": COLORS["red"]}[level]
-        bg = {"baik": "rgba(34, 197, 94, 0.12)", "cukup": "rgba(234, 179, 8, 0.12)",
-              "buruk": "rgba(239, 68, 68, 0.12)"}[level]
+        if level == "buruk":
+            # Latensi yang berubah tiap stream adalah sifat driver USB generik (mis. SC202HD), bukan
+            # kesalahan pengguna; kanal acuan mengatasinya, jadi tidak ditampilkan sebagai error merah.
+            reference = self.reference_check.isChecked()
+            text = MSG_VARIES_HANDLED if reference else text
+            color, bg = (COLORS["text2"], "rgba(139, 152, 165, 0.12)") if reference else                 (COLORS["yellow"], "rgba(234, 179, 8, 0.12)")
+            self.calibration_hint.setText(HINT_VARIES_HANDLED if reference else HINT_VARIES_ENABLE)
+            self.calibration_hint.show()
+        else:
+            color = {"baik": COLORS["green"], "cukup": COLORS["yellow"]}[level]
+            bg = {"baik": "rgba(34, 197, 94, 0.12)", "cukup": "rgba(234, 179, 8, 0.12)"}[level]
         self.latency_value.setText(f"{result.latency_ms:.1f} ms")
         self.accuracy_badge.setText(("✓ " if level == "baik" else "") + text)
         self._badge_style(color, bg)

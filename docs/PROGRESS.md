@@ -605,3 +605,13 @@ SC202HD akhirnya tersambung. Chip di dalamnya **Realtek** (USB `VID_0BDA&PID_4E1
 Mode `--acuan-satu-kabel`: take vokal (loopback playback) sekaligus menjadi acuannya sendiri; menguji pengukuran dan penggeseran per take dengan sinyal hardware asli. Yang belum teruji di hardware hanya keserempakan Input 1 dan Input 2 (satu chip, satu clock); uji dua kabel (`--acuan`) menunggu kabel kedua.
 
 **Diperbaiki saat uji:** `JUMP_TOLERANCE` penyejajaran 8 → 24 sampel. Di hardware, klik aksen dan klik biasa (nada berbeda) terukur selisih 11 sampel karena tunda DAC/kabel/ADC bergantung frekuensi, sehingga muncul 7 "lompatan" palsu per take 8 detik. Lompatan driver nyata ≥ 65 sampel. Tes regresi ditambahkan.
+
+---
+
+## Rilis 1.2.0 (07-11-2026)
+
+- Versi 1.2.0 (fitur baru: kanal acuan sinkronisasi, pemanasan sound card).
+- Layar Kalibrasi Latensi: teks "Latensi terukur" tidak lagi menempel pada angka (status pindah ke baris sendiri). Hasil yang berubah-ubah ditampilkan "Berubah-ubah" (netral) dengan penjelasan bila kanal acuan aktif, atau "Tidak konsisten" (kuning, bukan merah) dengan saran mengaktifkan kanal acuan. Label berubah langsung saat kotak centang diklik.
+- `tools/build_installer.py`: laporan berkas installer kini memakai nama sesuai versi (sebelumnya bisa menyebut Setup.exe versi lama di folder yang sama).
+- Tes baru `test_calibration_badge_for_varying_latency`; **256 tes lulus**.
+- `HarmoniSATB-Studio-1.2.0-Setup.exe` (87 MB) dibangun, aplikasi hasil build lulus uji tanpa Python di PATH (buka/tutup, `--uji-mandiri` −14,04 LUFS), lalu **dipasang menimpa 1.1.0** di laptop ini (`/VERYSILENT /CURRENTUSER`) dan diuji lagi dari folder instalasi: lulus.

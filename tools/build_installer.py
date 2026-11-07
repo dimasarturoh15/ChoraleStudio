@@ -157,7 +157,7 @@ def main() -> int:
         print("   lalu jalankan ulang skrip ini.")
         return 2
     subprocess.run([str(iscc), f"/DMyAppVersion={__version__}", str(ISS)], check=True, cwd=ROOT / "installer")
-    setup = next((ROOT / "installer" / "Output").glob("*Setup.exe"))
+    setup = ROOT / "installer" / "Output" / f"HarmoniSATB-Studio-{__version__}-Setup.exe"
     print(f"   Installer: {setup} ({setup.stat().st_size / 1024**2:.0f} MB)")
     return 0
 

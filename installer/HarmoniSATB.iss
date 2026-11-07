@@ -1,6 +1,6 @@
 ; Installer HarmoniSATB Studio (Inno Setup 6).
 ; Dibuat oleh tools\build_installer.py setelah PyInstaller selesai:
-;   ISCC.exe /DMyAppVersion=1.1.0 installer\HarmoniSATB.iss
+;   ISCC.exe /DMyAppVersion=1.2.0 installer\HarmoniSATB.iss
 ;
 ; - Instal per pengguna (tanpa hak administrator) ke %LOCALAPPDATA%\Programs\HarmoniSATB Studio,
 ;   atau ke Program Files bila pengguna memilih "untuk semua pengguna".
@@ -9,7 +9,7 @@
 ;   %APPDATA%\HarmoniSATB (pengaturan, kalibrasi, log) dan folder proyek (Documents\HarmoniSATB).
 
 #ifndef MyAppVersion
-  #define MyAppVersion "1.1.0"
+  #define MyAppVersion "1.2.0"
 #endif
 #define MyAppName "HarmoniSATB Studio"
 #define MyAppExe "HarmoniSATB Studio.exe"

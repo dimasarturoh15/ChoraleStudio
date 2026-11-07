@@ -8,7 +8,7 @@ HarmoniSATB Studio membantu paduan suara merekam **piano/orgen** lalu **Bass, Te
 
 ## 1. Memasang aplikasi
 
-1. Klik dua kali **HarmoniSATB-Studio-1.1.0-Setup.exe**.
+1. Klik dua kali **HarmoniSATB-Studio-1.2.0-Setup.exe**.
 2. Ikuti langkah di layar. Centang **"Buat shortcut di Desktop"** jika ingin ikon di Desktop.
 3. Setelah selesai, buka **HarmoniSATB Studio** dari Start Menu atau Desktop.
 
