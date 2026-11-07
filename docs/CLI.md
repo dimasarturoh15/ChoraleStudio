@@ -67,6 +67,7 @@ Merekam klik metronom lewat loopback ke lima track lalu mengukur selisih antar-t
 | `--detik N` | Durasi setiap track |
 | `--yes` | Lewati konfirmasi Enter |
 | `--simpan` | Simpan proyek uji (default dihapus) |
+| `--acuan` | Uji kanal acuan: kabel kedua Output R → Input 2; track vokal disejajarkan dengan kanal acuan seperti di aplikasi |
 
 ## Stabilitas
 

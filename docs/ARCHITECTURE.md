@@ -126,6 +126,23 @@ Saat merekam, output berisi campuran track lain yang tidak di-mute ditambah klik
 
 Dengan kabel dari output ke input, aplikasi memutar sweep, merekamnya, dan mencari jeda dengan korelasi silang. Percobaan diulang beberapa kali dan hasilnya disimpan per kombinasi perangkat, host API, mode exclusive, dan ukuran buffer di `calibration.json`.
 
+### Kanal acuan dan pemanasan (temuan uji SC202HD)
+
+Driver USB generik pada SC202HD (chip Realtek, tanpa ASIO) memulai setiap stream dengan latensi berbeda (selisih 1 sampai sekitar 6 ms) dan kadang menggesernya di tengah stream tanpa laporan error. Kalibrasi sekali pakai tidak bisa menangkapnya. Dua pengaman:
+
+- **Pemanasan** (`AudioSession(warmup_seconds=5)`): saat merekam, stream dimulai 5 detik sebelum hitungan awal; output hening dan tidak ada yang direkam. Ini menyerap pergeseran di detik-detik pertama stream.
+- **Kanal acuan** (`AudioSession(reference_channel=...)`, `chorale/audio/alignment.py`, opsi "Kanal acuan sinkronisasi" di Pengaturan): saat merekam vokal, kabel Output → input yang tidak dipakai mikrofon direkam ke berkas pendamping `<take>_acuan.wav` lewat ring buffer kedua (callback hanya menyalin). Saat Stop:
+
+```text
+acuan[i]  ~= diputar[i - e]          e = latensi sebenarnya - latensi kalibrasi
+take[i]   berisi frame musik i - e    (penyanyi mengikuti playback yang sama)
+take'[q]  = take[q + e(q)]           e diukur per jendela 1 s tiap 0,5 s (korelasi ternormalisasi, +-100 ms)
+```
+
+Jendela yang acuannya pelan atau tidak jelas dilewati; lonjakan tunggal dibuang dengan median 3 titik; perubahan e lebih dari 8 sampel menjadi segmen baru, dan sambungan antar-segmen diberi fade 1 ms. Take ditulis ulang secara atomik (berkas sementara lalu `os.replace`), berkas acuan dihapus, dan `Take.alignment` bernilai `"acuan"`. Jika acuan tidak terdeteksi, take hasil kalibrasi dipertahankan dan pengguna mendapat peringatan. Track piano tidak memakai kanal acuan karena kedua input dipakai piano stereo; piano menjadi patokan bagi track vokal.
+
+`tools/stress_test.py --loopback` mendeteksi lompatan latensi diam-diam selama uji panjang; `tools/sync_test.py --acuan` menguji kanal acuan dengan dua kabel loopback.
+
 ## Rantai pascaproduksi
 
 `process_project()` memuat take aktif setiap track, menjalankan tahap berikut, lalu menjumlahkan semuanya menjadi campuran stereo. Track tanpa take dilewati.

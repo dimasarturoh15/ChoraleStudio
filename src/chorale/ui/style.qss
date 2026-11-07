@@ -227,6 +227,11 @@ QLabel[role="badgeWarn"] {
     border-radius: 4px; padding: 1px 6px; font-size: 13px;
 }
 QRadioButton { font-size: 16px; font-weight: 600; spacing: 12px; }
+QCheckBox { font-size: 15px; font-weight: 500; spacing: 10px; color: @text; }
+QCheckBox::indicator { width: 16px; height: 16px; border-radius: 4px; border: 2px solid @text2; background: transparent; }
+QCheckBox::indicator:checked { background: @blue; border-color: @blue; image: url(@icon_check); }
+QCheckBox:focus { outline: none; }
+QCheckBox::indicator:focus { border-color: @blue; }
 QRadioButton::indicator { width: 18px; height: 18px; border-radius: 10px; border: 2px solid @text2; }
 QRadioButton::indicator:checked { border: 5px solid @blue; background: #FFFFFF; width: 10px; height: 10px; }
 QPushButton[variant="danger"] {

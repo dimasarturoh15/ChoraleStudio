@@ -4,6 +4,17 @@ Semua perubahan penting pada HarmoniSATB Studio dicatat di berkas ini. Formatnya
 
 ## [Belum dirilis]
 
+### Ditambahkan
+
+- **Kanal acuan sinkronisasi** (Pengaturan > Pemetaan Input): saat merekam vokal, kabel dari Output ke input yang tidak dipakai mikrofon dipakai untuk mengukur latensi sebenarnya setiap take, lalu take disejajarkan dengan piano, termasuk lompatan latensi di tengah lagu. Ditambah pengingat di Persiapan Rekam Vokal.
+- Pemanasan sound card 5 detik sebelum hitungan awal saat merekam ("Menyiapkan sound card …").
+- `tools/stress_test.py --loopback` (deteksi lompatan latensi diam-diam) dan `tools/sync_test.py --acuan`.
+
+### Diubah
+
+- Target sinkronisasi PRD menjadi ≤ 3 ms (PRD v1.1 rev. 1) setelah uji SPL Audio SC202HD.
+- Panduan pengguna: persiapan laptop sebelum merekam (charger, aplikasi pengolah suara dimatikan, USB selective suspend dimatikan).
+
 ### Dokumentasi
 
 - README ditulis ulang: fitur, tangkapan layar, kebutuhan sistem, instalasi, status kriteria penerimaan.

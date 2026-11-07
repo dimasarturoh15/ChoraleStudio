@@ -258,6 +258,7 @@ Fitur berikut sengaja tidak dikerjakan di v1.1 dan bisa dipertimbangkan untuk ve
 
 | Versi | Tanggal | Perubahan |
 |---|---|---|
+| 1.1 rev. 2 | 07-11-2026 | Ditambah **kanal acuan sinkronisasi** (opsional, disetujui pemilik proyek): saat merekam vokal, kabel Output → input yang tidak dipakai mikrofon merekam apa yang benar-benar diputar; setiap take vokal disejajarkan dengan piano berdasarkan kanal itu, termasuk lompatan latensi di tengah lagu. Kalibrasi tetap menjadi cadangan |
 | 1.1 rev. 1 | 07-11-2026 | Target sinkronisasi antar-track diubah dari ≤ 1 ms menjadi ≤ 3 ms (keputusan pemilik proyek). Uji SC202HD: driver USB generik (chip Realtek, tanpa ASIO) menggeser latensi 1–3 ms setiap stream dibuka dan tidak bisa dikoreksi otomatis. Selisih 3 ms setara jarak sekitar 1 m antar-penyanyi: tidak terdengar sebagai gema karena setiap suara dinyanyikan orang berbeda. Ditambah pemanasan sound card 5 detik sebelum hitungan awal |
 | 1.1 | 06-11-2026 | Disesuaikan ke SPL Audio SC202HD; pitch correction dihapus; monitoring via direct monitor fisik; auto-balance + slider; prioritas mastering TP > LUFS > LRA; manajemen proyek; jadwal 10 minggu |
 | 1.0 | 06-11-2026 | Draf awal |

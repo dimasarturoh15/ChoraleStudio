@@ -51,9 +51,9 @@ SEBELUM MULAI (penting):
 Bunyi yang diputar: klik metronom 120 BPM, sekitar {total:.0f} detik total."""
 
 
-def record(project, selection, track, seconds, blocksize, metronome) -> tuple:
+def record(project, selection, track, seconds, blocksize, metronome, reference_channel=None) -> tuple:
     session = AudioSession(project, selection, record_track=track, blocksize=blocksize,
-                           warmup_seconds=WARMUP_SECONDS,
+                           warmup_seconds=WARMUP_SECONDS, reference_channel=reference_channel,
                            record_channels=1, metronome=metronome, metronome_volume_db=-12.0)
     session.start()
     while session.song_seconds < seconds:
@@ -72,6 +72,8 @@ def main() -> int:
     parser.add_argument("--detik", type=float, default=8.0, help="durasi tiap track (detik)")
     parser.add_argument("--yes", action="store_true", help="lewati konfirmasi Enter")
     parser.add_argument("--simpan", action="store_true", help="simpan proyek uji (default dihapus)")
+    parser.add_argument("--acuan", action="store_true",
+                        help="uji kanal acuan: kabel kedua Output R -> Input 2 untuk track vokal")
     args = parser.parse_args()
 
     try:
@@ -90,7 +92,9 @@ def main() -> int:
         return 1
     print(f"  Kalibrasi  : {cal.latency_samples} sampel ({cal.latency_ms:.2f} ms), {cal.date}")
     print()
-    print(INSTRUCTIONS.format(total=5 * (args.detik + 2)))
+    print(INSTRUCTIONS.format(total=5 * (args.detik + 2 + WARMUP_SECONDS)))
+    if args.acuan:
+        print("  5. KANAL ACUAN: kabel kedua dari Output kanan (R) ke INPUT 2, gain Input 2 kecil.")
     if not args.yes:
         input("\n  Tekan Enter jika kabel loopback sudah terpasang... ")
 
@@ -103,12 +107,17 @@ def main() -> int:
             is_piano = track == "piano"
             print(f"  Merekam {TRACK_LABELS[track]:<12}...", end="", flush=True)
             session, take = record(project, selection, track, args.detik, args.buffer,
-                                   metronome=True if is_piano else False)
+                                   metronome=True if is_piano else False,
+                                   reference_channel=None if is_piano or not args.acuan else 1)
             dropouts += session.dropouts
             if take is None:
                 print(" GAGAL (tidak ada audio)")
                 return 1
-            print(f" {take.duration:.1f} s, dropout {session.dropouts}")
+            note = f", disejajarkan: {take.alignment}" if args.acuan and not is_piano else ""
+            print(f" {take.duration:.1f} s, dropout {session.dropouts}{note}")
+            for w in session.warnings:
+                if "lebih pendek dari 90%" not in w:
+                    print(f"    peringatan: {w}")
             if is_piano:
                 project.set_solo("piano", True)
 

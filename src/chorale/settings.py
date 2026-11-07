@@ -25,6 +25,7 @@ class AppSettings:
     vocal_input: str = "1"
     projects_dir: str | None = None     # None = Documents\HarmoniSATB
     metronome_volume: int = 80          # persen; 100% = 0 dB
+    sync_reference: bool = False        # kabel Output -> input lain sebagai kanal acuan saat merekam vokal
 
     def metronome_volume_db(self) -> float:
         return 20 * math.log10(max(self.metronome_volume, 1) / 100)
@@ -37,6 +38,10 @@ class AppSettings:
 
     def vocal_channel(self) -> int:
         return int(self.vocal_input) - 1
+
+    def reference_channel(self) -> int | None:
+        """Kanal acuan (berbasis 0) untuk take vokal: input yang tidak dipakai mikrofon; None jika mati."""
+        return 1 - self.vocal_channel() if self.sync_reference else None
 
 
 def settings_path() -> Path:
@@ -65,6 +70,8 @@ def load_settings(path: Path | None = None) -> AppSettings:
         s.vocal_input = defaults.vocal_input
     if not isinstance(s.metronome_volume, int) or not 0 <= s.metronome_volume <= 100:
         s.metronome_volume = defaults.metronome_volume
+    if not isinstance(s.sync_reference, bool):
+        s.sync_reference = defaults.sync_reference
     return s
 
 

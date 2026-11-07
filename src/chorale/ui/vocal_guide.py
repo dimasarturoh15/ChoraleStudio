@@ -33,6 +33,8 @@ STEP_ITEMS = (
      "Tekan Putar Piano untuk mencoba volume headphone."),
 )
 HIGHLIGHT = (None, 2, 0)
+MSG_REFERENCE_CABLE = ("Kanal acuan aktif: pastikan kabel dari Output ke Input {n} terpasang dengan gain kecil, "
+                       "agar setiap take sejajar otomatis dengan piano.")
 
 
 def level_status(peak_db: float) -> tuple[str, str]:
@@ -234,6 +236,11 @@ class VocalGuideOverlay(ModalOverlay):
                 f.setLayout(hbox(vbox(num, None), 16, t, margins=(18, 14, 18, 14)))
                 col.addWidget(f)
                 frames.append(f)
+            if s == len(STEP_ITEMS) - 1:
+                self.reference_hint = label("", "hint")
+                self.reference_hint.setWordWrap(True)
+                self.reference_hint.hide()
+                col.addWidget(self.reference_hint)
             col.addStretch(1)
             self._item_frames.append(frames)
             self.items_stack.addWidget(page)
@@ -300,9 +307,13 @@ class VocalGuideOverlay(ModalOverlay):
         lay.addLayout(hbox(self.back_btn, None, self.next_btn))
         self._show_step()
 
-    def open_for(self, input_text: str) -> None:
+    def open_for(self, input_text: str, reference_input: int | None = None) -> None:
+        """reference_input: nomor input kanal acuan (1/2) jika fitur aktif."""
         self.step = 0
         self.input_hint.setText(input_text)
+        self.reference_hint.setVisible(reference_input is not None)
+        if reference_input is not None:
+            self.reference_hint.setText(MSG_REFERENCE_CABLE.format(n=reference_input))
         self._history.clear()
         self._show_step()
         self.open()

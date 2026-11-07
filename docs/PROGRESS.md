@@ -583,3 +583,15 @@ SC202HD akhirnya tersambung. Chip di dalamnya **Realtek** (USB `VID_0BDA&PID_4E1
 | `sync_test.py` putaran 2 (pemanasan 5 s) | 2,26 ms → lulus |
 
 **Kesimpulan jujur:** target ≤ 3 ms **belum terpenuhi secara andal**. Pemanasan hanya mengatasi lompatan di detik-detik awal *di dalam* satu rekaman; pergeseran latensi *antar*-rekaman (sampai sekitar 6 ms) tidak bisa diketahui aplikasi tanpa acuan. Usulan perbaikan berikutnya (kanal acuan loopback di Input 2) menunggu keputusan pengguna karena butuh kabel tambahan saat merekam.
+
+### Keputusan pengguna: kanal acuan sinkronisasi (07-11-2026)
+
+**Dikerjakan**
+- `chorale/audio/alignment.py` (NumPy saja): `measure_offsets` (korelasi ternormalisasi per jendela 1 s tiap 0,5 s, rentang ±100 ms), `build_segments` (median 3 titik, lompatan > 8 sampel menjadi segmen baru), `apply_segments` (take[q + e], fade 1 ms di sambungan), `align_take` (tulis ulang atomik).
+- `AudioSession(reference_channel=...)`: ring buffer kedua merekam kanal acuan ke `<take>_acuan.wav`; saat Stop take disejajarkan, berkas acuan dihapus, `Take.alignment = "acuan"` dan `latency_compensation` diperbarui. Jika acuan tidak terdeteksi: take hasil kalibrasi dipertahankan + peringatan.
+- Pengaturan: opsi "Kanal acuan sinkronisasi" (`AppSettings.sync_reference`; kanal acuan = input yang tidak dipakai mikrofon). Persiapan Rekam Vokal langkah 3 menampilkan pengingat kabel bila aktif. Piano tidak memakai kanal acuan (kedua input dipakai piano stereo).
+- `tools/sync_test.py --acuan` (kabel kedua Output R → Input 2) untuk uji hardware.
+- Dokumen: PRD v1.1 rev. 2, ARCHITECTURE (bagian kanal acuan dan pemanasan), PANDUAN_PENGGUNA, UJI_LAPANGAN, CLI, CHANGELOG.
+- Tes baru `tests/test_alignment.py` (8 tes: pergeseran dan lompatan, penyusunan ulang, offset negatif, acuan hening, penulisan atomik, sesi end-to-end dengan stream palsu, fallback, validasi kanal). **254 tes lulus.**
+
+**Belum:** uji hardware `sync_test.py --acuan` di SC202HD (menunggu stress test 60 menit selesai dan kabel kedua dipasang).

@@ -35,13 +35,14 @@ Colok sound card (SPL Audio SC202HD) ke laptop, lalu buka **Pengaturan** (pojok 
 - **Mode Driver:** biarkan pilihan otomatis. Pilih **WASAPI Shared** hanya jika mode lain gagal.
 - **Ukuran Buffer:** biarkan **256 sampel**. Naikkan jika suara terdengar putus-putus.
 - **Pemetaan Input:** pilih colokan untuk piano dan mikrofon. Meter bergerak saat ada suara.
+- **Kanal acuan sinkronisasi** (disarankan untuk SC202HD): centang opsi ini, lalu saat merekam vokal sambungkan kabel dari **Output** ke input yang tidak dipakai mikrofon (biasanya **Input 2**) dengan gain kecil. Setiap take vokal lalu disejajarkan otomatis dengan piano, walau latensi sound card berubah-ubah. Untuk merekam piano stereo, cabut dulu kabel ini karena kedua input dipakai piano.
 - **Kalibrasi Latensi** (cukup sekali):
   1. Kecilkan volume headphone dan **matikan tombol +48V**.
   2. Sambungkan kabel dari **Output** ke **Input 1** sound card.
   3. Tekan **Mulai Kalibrasi** dan tunggu hasilnya: **Akurat** atau **Cukup** berarti baik. Jika muncul **Tidak konsisten**, ulangi sekali lagi.
   4. Lepas kabel, lalu tekan **Simpan**.
 
-Kalibrasi membuat semua suara yang direkam terpisah tetap jatuh tepat di ketukan yang sama.
+Kalibrasi membuat semua suara yang direkam terpisah tetap jatuh tepat di ketukan yang sama. Bila kanal acuan aktif, kalibrasi tetap dipakai sebagai cadangan jika kabel acuan lupa dipasang.
 
 ---
 

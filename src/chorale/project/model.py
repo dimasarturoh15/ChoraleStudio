@@ -57,6 +57,7 @@ class Take:
     duration: float
     complete: bool = True
     latency_compensation: int = 0  # sampel yang dibuang di awal agar sejajar dengan track lain
+    alignment: str = "kalibrasi"   # "kalibrasi" atau "acuan" (disejajarkan memakai kanal acuan)
 
     @property
     def label(self) -> str:

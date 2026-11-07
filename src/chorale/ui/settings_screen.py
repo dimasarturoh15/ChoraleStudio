@@ -9,7 +9,7 @@ from datetime import datetime
 from PySide6.QtCore import QThread, QTimer, Qt, Signal
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
-    QComboBox, QFrame, QGridLayout, QHBoxLayout, QMessageBox, QScrollArea, QStackedWidget, QVBoxLayout,
+    QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QMessageBox, QScrollArea, QStackedWidget, QVBoxLayout,
     QWidget,
 )
 
@@ -143,6 +143,10 @@ class AudioDevicePage(QWidget):
         self.vocal_meter = LevelMeterBar(180)
         self.meter_status = label("", "hint")
         self.meter_status.setWordWrap(True)
+        self.reference_check = QCheckBox("Kanal acuan sinkronisasi")
+        self.reference_check.setCursor(Qt.PointingHandCursor)
+        self.reference_hint = label("", "hint")
+        self.reference_hint.setWordWrap(True)
         sep = QFrame()
         sep.setObjectName("separator")
         mapping = card()
@@ -152,7 +156,8 @@ class AudioDevicePage(QWidget):
                  self.instrument_meter), 8,
             self.instrument_combo, 12, sep, 12,
             hbox(color_dot(COLORS["blue"]), 8, label("Vokal (Mikrofon)", "body"), None, self.vocal_meter), 8,
-            self.vocal_combo, 6, self.meter_status, None,
+            self.vocal_combo, 6, self.meter_status, 12,
+            self.reference_check, 4, self.reference_hint, None,
             margins=(24, 20, 24, 20)))
 
         # Kalibrasi Latensi
@@ -200,6 +205,8 @@ class AudioDevicePage(QWidget):
         self.device_combo.currentIndexChanged.connect(self._on_device_changed)
         self.mode.changed.connect(self._on_mode_changed)
         self.buffer_combo.currentIndexChanged.connect(lambda _i: self._reselect())
+        self.vocal_combo.currentIndexChanged.connect(lambda _i: self._update_reference_hint())
+        self.reference_check.toggled.connect(lambda _on: self._update_reference_hint())
         self._meter_timer = QTimer(self)
         self._meter_timer.setInterval(1000 // LEVEL_FPS)
         self._meter_timer.timeout.connect(self._update_meters)
@@ -228,6 +235,8 @@ class AudioDevicePage(QWidget):
         _select_data(self.buffer_combo, settings.blocksize)
         _select_data(self.instrument_combo, settings.instrument_input)
         _select_data(self.vocal_combo, settings.vocal_input)
+        self.reference_check.setChecked(settings.sync_reference)
+        self._update_reference_hint()
         self._on_device_changed()
 
     def collect(self) -> AppSettings:
@@ -238,7 +247,14 @@ class AudioDevicePage(QWidget):
         s.blocksize = self.buffer_combo.currentData()
         s.instrument_input = self.instrument_combo.currentData()
         s.vocal_input = self.vocal_combo.currentData()
+        s.sync_reference = self.reference_check.isChecked()
         return s
+
+    def _update_reference_hint(self) -> None:
+        other = "2" if self.vocal_combo.currentData() == "1" else "1"
+        self.reference_hint.setText(
+            f"Saat merekam vokal, sambungkan kabel dari Output ke Input {other} dengan gain kecil. "
+            "Setiap take lalu disejajarkan otomatis dengan piano, walau latensi sound card berubah.")
 
     # ----- perangkat -----
     def _current_card(self) -> dev.SoundCard | None:

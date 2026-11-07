@@ -20,6 +20,7 @@ setelahnya, agar file di disk selalu sudah sejajar (aman jika listrik padam).
 
 from __future__ import annotations
 
+import logging
 import time
 from dataclasses import dataclass
 from datetime import datetime
@@ -37,6 +38,8 @@ from chorale.audio.player import Player, build_monitor_mix
 from chorale.audio.recorder import Recorder, check_free_space
 from chorale.project.model import Project, Take
 
+log = logging.getLogger("chorale.audio")
+
 _FLAGS = ("input_overflow", "input_underflow", "output_underflow", "output_overflow")
 COMPLETE_RATIO = 0.9
 WARMUP_SECONDS = 5.0  # pemanasan sebelum hitungan awal saat merekam (uji SC202HD 07-11-2026)
@@ -49,6 +52,12 @@ MSG_NO_CALIBRATION = (
 MSG_TOO_SHORT = (
     "Take ini lebih pendek dari 90% durasi piano, jadi ditandai tidak lengkap."
 )
+MSG_NO_REFERENCE = (
+    "Kanal acuan tidak terdeteksi, jadi take disejajarkan memakai kalibrasi. "
+    "Periksa kabel dari Output ke Input acuan dan pastikan gain-nya tidak nol."
+)
+REFERENCE_SUFFIX = "_acuan.wav"
+ALIGN_CALIBRATION, ALIGN_REFERENCE = "kalibrasi", "acuan"
 
 
 @dataclass(frozen=True)
@@ -88,6 +97,7 @@ class AudioSession:
         stream_factory=open_duplex_stream,
         playback_mix: np.ndarray | None = None,
         warmup_seconds: float = 0.0,
+        reference_channel: int | None = None,
     ):
         """
         metronome: klik selama lagu (None = ikuti pengaturan proyek).
@@ -95,6 +105,8 @@ class AudioSession:
         latency_samples: paksa nilai latensi; None = dari kalibrasi, atau perkiraan driver.
         playback_mix: buffer stereo yang diputar sebagai ganti campuran proyek (mis. pratinjau satu take).
         warmup_seconds: hening sebelum hitungan awal, hanya saat merekam (lihat WARMUP_SECONDS).
+        reference_channel: kanal input (berbasis 0) yang tersambung kabel ke output; jika diisi,
+            take disejajarkan memakai kanal acuan saat Stop (lihat chorale.audio.alignment).
         """
         self.project = project
         self.selection = selection
@@ -148,10 +160,17 @@ class AudioSession:
         self.recorder: Recorder | None = None
         self.take_id: int | None = None
         self._recorded_at: datetime | None = None
+        self.reference_recorder: Recorder | None = None
         if record_track is not None:
             self._recorded_at = datetime.now()
             self.take_id, path = project.next_take_path(record_track, self._recorded_at)
             self.recorder = Recorder(path, record_channels, first_channel=input_first_channel)
+            if reference_channel is not None:
+                used = range(input_first_channel, input_first_channel + record_channels)
+                if reference_channel in used or reference_channel >= selection.input_channels:
+                    raise ValueError("Kanal acuan harus input lain yang tidak dipakai untuk merekam.")
+                self.reference_recorder = Recorder(path.with_name(path.stem + REFERENCE_SUFFIX), 1,
+                                                   first_channel=reference_channel)
 
         self._flag_counts = np.zeros(len(_FLAGS), dtype=np.int64)
         self._stream = None
@@ -173,7 +192,10 @@ class AudioSession:
         if self.recorder is not None:
             skip = self.latency_samples - song_start
             if skip < frames:
-                self.recorder.process_input(indata[skip:] if skip > 0 else indata)
+                block = indata[skip:] if skip > 0 else indata
+                self.recorder.process_input(block)
+                if self.reference_recorder is not None:
+                    self.reference_recorder.process_input(block)
         self._song_frame = song_start + frames
 
     def _on_finished(self):
@@ -183,6 +205,8 @@ class AudioSession:
     def start(self) -> None:
         if self.recorder is not None:
             self.recorder.start()
+        if self.reference_recorder is not None:
+            self.reference_recorder.start()
         try:
             self._stream = self._stream_factory(self.selection, self._callback, self.blocksize,
                                                 finished_callback=self._on_finished)
@@ -200,6 +224,7 @@ class AudioSession:
                 self._stream.close()
             if self.recorder is not None:
                 self._discard_empty(self.recorder.stop())
+            self._remove_reference()
             raise
 
     @property
@@ -264,6 +289,7 @@ class AudioSession:
             return None
         result = self.recorder.stop()
         if self._discard_empty(result):
+            self._remove_reference()
             return None
 
         complete = not lost and result.error is None
@@ -271,13 +297,23 @@ class AudioSession:
         if self.record_track != "piano" and piano is not None and result.duration < COMPLETE_RATIO * piano.duration:
             complete = False
             self.warnings.append(MSG_TOO_SHORT)
+        duration = result.duration
+        latency = self.latency_samples or 0
+        alignment = ALIGN_CALIBRATION
+        if self.reference_recorder is not None:
+            aligned = self._align_with_reference(result.path)
+            if aligned is not None:
+                duration = aligned.frames / SAMPLE_RATE
+                latency += aligned.offset
+                alignment = ALIGN_REFERENCE
         take = Take(
             id=self.take_id,
             filename=result.path.name,
             recorded_at=self._recorded_at.isoformat(timespec="seconds"),
-            duration=round(result.duration, 3),
+            duration=round(duration, 3),
             complete=complete,
-            latency_compensation=self.latency_samples or 0,
+            latency_compensation=latency,
+            alignment=alignment,
         )
         self.project.add_take(self.record_track, take)
         if lost:
@@ -285,6 +321,40 @@ class AudioSession:
         if result.error:
             self.warnings.append(result.error)
         return take
+
+    def played_reference(self, frames: int) -> np.ndarray:
+        """Sinyal yang keluar dari output mulai frame lagu 0 (campuran monitoring + klik), mono."""
+        mix = self.player._mix  # noqa: SLF001 - buffer yang sama yang diputar callback
+        out = np.zeros(frames, dtype=np.float32)
+        n = min(frames, len(mix))
+        if n > 0:
+            out[:n] = mix[:n].mean(axis=1)
+        out += self.metronome.click_train(frames)
+        return out
+
+    def _align_with_reference(self, take_path: Path):
+        """Sejajarkan take dengan kanal acuan; hapus berkas acuan. None = acuan tidak terdeteksi."""
+        from chorale.audio.alignment import align_take
+
+        ref = self.reference_recorder.stop()
+        try:
+            if ref.frames == 0 or ref.error:
+                self.warnings.append(MSG_NO_REFERENCE)
+                return None
+            aligned = align_take(take_path, ref.path, self.played_reference(ref.frames + SAMPLE_RATE))
+            if aligned is None:
+                self.warnings.append(MSG_NO_REFERENCE)
+            return aligned
+        except Exception:  # noqa: BLE001 - take hasil kalibrasi tetap utuh
+            log.exception("Penyejajaran kanal acuan gagal untuk %s", take_path.name)
+            self.warnings.append(MSG_NO_REFERENCE)
+            return None
+        finally:
+            ref.path.unlink(missing_ok=True)
+
+    def _remove_reference(self) -> None:
+        if self.reference_recorder is not None:
+            self.reference_recorder.stop().path.unlink(missing_ok=True)
 
     @staticmethod
     def _discard_empty(result) -> bool:

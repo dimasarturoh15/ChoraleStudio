@@ -64,6 +64,7 @@ Cetak dokumen ini, atau isi langsung di komputer. Setiap uji punya kolom **Hasil
 | Langkah | Yang dicatat | Hasil | Lulus / Gagal |
 |---|---|---|---|
 | Jalankan `tools\sync_test.py` (lihat README). Aplikasi merekam 5 track klik lewat kabel loopback. | "Selisih terbesar antar-track" (ms). | ____ ms | Lulus jika **≤ 3 ms** |
+| Pasang kabel kedua dari Output kanan (R) ke **Input 2**, lalu jalankan `tools\sync_test.py --acuan`. Track vokal disejajarkan dengan kanal acuan. | "Selisih terbesar antar-track" (ms) dan tulisan "disejajarkan: acuan" di tiap track vokal. | ____ ms | Lulus jika **≤ 3 ms** (diharapkan jauh di bawahnya) |
 
 ---
 

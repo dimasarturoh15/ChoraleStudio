@@ -394,7 +394,9 @@ class RecordingScreen(QWidget):
         first_vocal = not any(self.project.tracks[t].takes for t in VOCAL_TRACK_IDS)
         if track_id in VOCAL_TRACK_IDS and first_vocal and not self.project.vocal_guide_done:
             self._guide_track = track_id
-            self.guide.open_for(input_text(track_id, self.settings).replace("Mic", "Mono"))
+            ref = self.controller.reference_channel_for(track_id)
+            self.guide.open_for(input_text(track_id, self.settings).replace("Mic", "Mono"),
+                                reference_input=None if ref is None else ref + 1)
             return
         self._start_recording(track_id)
 

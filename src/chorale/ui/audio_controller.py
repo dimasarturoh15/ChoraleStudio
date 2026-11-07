@@ -167,6 +167,17 @@ class AudioController:
             first, count = 0, min(count, available)
         return first, count
 
+    def reference_channel_for(self, track_id: str) -> int | None:
+        """Kanal acuan untuk track vokal jika diaktifkan dan tersedia; piano memakai kedua input."""
+        ref = self.settings.reference_channel()
+        if track_id == "piano" or ref is None:
+            return None
+        first, count = self.input_channels_for(track_id)
+        available = self.selection.input_channels if self.selection else 2
+        if ref >= available or first <= ref < first + count:
+            return None
+        return ref
+
     def disk_warning(self) -> str | None:
         space = check_free_space(self.project.takes_dir)
         return None if space.ok else space.message
@@ -204,7 +215,8 @@ class AudioController:
                 first, count = self.input_channels_for(record_track)
                 return AudioSession(project, selection, record_track=record_track,
                                     input_first_channel=first, record_channels=count,
-                                    warmup_seconds=self.warmup_seconds, **kwargs)
+                                    warmup_seconds=self.warmup_seconds,
+                                    reference_channel=self.reference_channel_for(record_track), **kwargs)
             if preview_path is not None:
                 audio = load_take_audio(preview_path)
                 mix = np.repeat(audio[:, :1], 2, axis=1) if audio.shape[1] == 1 else audio[:, :2]
